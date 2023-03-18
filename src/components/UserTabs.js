@@ -20,9 +20,13 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 
 import Books from "../screens/User/Books/Books";
+
 import Profile from "../screens/User/Profile/Profile";
+
 import Blogs from "../screens/User/Blogs/Blogs";
+
 import Advertisement from "../screens/User/Advertisements/Advertisements";
+import AdvertisementDetails from "../screens/User/Advertisements/AdvertisementDetails";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -67,6 +71,13 @@ function AdvertisementStackScreen() {
           headerShown: false,
         }}
       />
+      <AdvertisementStack.Screen
+        name="AdvertisementDetails"
+        component={AdvertisementDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
     </AdvertisementStack.Navigator>
   );
 }
@@ -92,162 +103,161 @@ export default function UserTabs() {
   // Animated Tab Indicator...
   const tabOffsetValue = useRef(new Animated.Value(0)).current;
   return (
-      <Tab.Navigator
-        tabBarOptions={{
-          showLabel: false,
-          // Floating Tab Bar...
-          style: {
-            backgroundColor: "white",
-            position: "absolute",
-            bottom: 20,
-            marginHorizontal: 20,
-            // Max Height...
-            height: 60,
-            borderRadius: 15,
-            // Shadow...
-            shadowColor: "#000",
-            shadowOpacity: 0.06,
-            shadowOffset: {
-              width: 10,
-              height: 10,
-            },
-            paddingHorizontal: 20,
+    <Tab.Navigator
+      tabBarOptions={{
+        showLabel: false,
+        // Floating Tab Bar...
+        style: {
+          backgroundColor: "white",
+          position: "absolute",
+          bottom: 20,
+          marginHorizontal: 20,
+          // Max Height...
+          height: 60,
+          borderRadius: 15,
+          // Shadow...
+          shadowColor: "#000",
+          shadowOpacity: 0.06,
+          shadowOffset: {
+            width: 10,
+            height: 10,
           },
+          paddingHorizontal: 20,
+        },
+      }}
+    >
+      {
+        // Tab Screens....
+        // Tab ICons....
+      }
+      <Tab.Screen
+        name={"Home"}
+        component={BooksStackScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                // centring Tab Button...
+                position: "absolute",
+                top: 20,
+              }}
+            >
+              <FontAwesome5
+                name="home"
+                size={22}
+                color={focused ? "#2E2EFF" : "gray"}
+              ></FontAwesome5>
+            </View>
+          ),
         }}
-      >
-        {
-          // Tab Screens....
-          // Tab ICons....
-        }
-        <Tab.Screen
-          name={"Home"}
-          component={BooksStackScreen}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  // centring Tab Button...
-                  position: "absolute",
-                  top: 20,
-                }}
-              >
-                <FontAwesome5
-                  name="home"
-                  size={22}
-                  color={focused ? "#2E2EFF" : "gray"}
-                ></FontAwesome5>
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            // Onpress Update....
-            tabPress: (e) => {
-              Animated.spring(tabOffsetValue, {
-                toValue: 8,
-                useNativeDriver: true,
-              }).start();
-            },
-          })}
-        ></Tab.Screen>
+        listeners={({ navigation, route }) => ({
+          // Onpress Update....
+          tabPress: (e) => {
+            Animated.spring(tabOffsetValue, {
+              toValue: 8,
+              useNativeDriver: true,
+            }).start();
+          },
+        })}
+      ></Tab.Screen>
 
-        <Tab.Screen
-          name={"Advertisements"}
-          component={AdvertisementStackScreen}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  // centring Tab Button...
-                  position: "absolute",
-                  top: 20,
-                }}
-              >
-                <FontAwesome5
-                  name="newspaper"
-                  size={22}
-                  color={focused ? "#2E2EFF" : "gray"}
-                ></FontAwesome5>
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            // Onpress Update....
-            tabPress: (e) => {
-              Animated.spring(tabOffsetValue, {
-                toValue: 92,
-                useNativeDriver: true,
-              }).start();
-            },
-          })}
-        ></Tab.Screen>
+      <Tab.Screen
+        name={"Advertisements"}
+        component={AdvertisementStackScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                // centring Tab Button...
+                position: "absolute",
+                top: 20,
+              }}
+            >
+              <FontAwesome5
+                name="newspaper"
+                size={22}
+                color={focused ? "#2E2EFF" : "gray"}
+              ></FontAwesome5>
+            </View>
+          ),
+        }}
+        listeners={({ navigation, route }) => ({
+          // Onpress Update....
+          tabPress: (e) => {
+            Animated.spring(tabOffsetValue, {
+              toValue: 92,
+              useNativeDriver: true,
+            }).start();
+          },
+        })}
+      ></Tab.Screen>
 
-        {
-          // Extra Tab Screen For Action Button..
-        }
+      {
+        // Extra Tab Screen For Action Button..
+      }
 
-        <Tab.Screen
-          name={"BlogsStack"}
-          component={BlogsStackScreen}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  // centring Tab Button...
-                  position: "absolute",
-                  top: 20,
-                }}
-              >
-                <FontAwesome5
-                  name="file-invoice"
-                  size={21}
-                  color={focused ? "#2E2EFF" : "gray"}
-                ></FontAwesome5>
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            // Onpress Update....
-            tabPress: (e) => {
-              Animated.spring(tabOffsetValue, {
-                toValue: getWidth() * 2.64,
-                useNativeDriver: true,
-              }).start();
-            },
-          })}
-        ></Tab.Screen>
+      <Tab.Screen
+        name={"BlogsStack"}
+        component={BlogsStackScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                // centring Tab Button...
+                position: "absolute",
+                top: 20,
+              }}
+            >
+              <FontAwesome5
+                name="file-invoice"
+                size={21}
+                color={focused ? "#2E2EFF" : "gray"}
+              ></FontAwesome5>
+            </View>
+          ),
+        }}
+        listeners={({ navigation, route }) => ({
+          // Onpress Update....
+          tabPress: (e) => {
+            Animated.spring(tabOffsetValue, {
+              toValue: getWidth() * 2.64,
+              useNativeDriver: true,
+            }).start();
+          },
+        })}
+      ></Tab.Screen>
 
-        <Tab.Screen
-          name={"ProfileStack"}
-          component={ProfileStackScreen}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  // centring Tab Button...
-                  position: "absolute",
-                  top: 20,
-                }}
-              >
-                <FontAwesome5
-                  name="user-alt"
-                  size={22}
-                  color={focused ? "#2E2EFF" : "gray"}
-                ></FontAwesome5>
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            // Onpress Update....
-            tabPress: (e) => {
-              Animated.spring(tabOffsetValue, {
-                toValue: getWidth() * 3.88,
-                useNativeDriver: true,
-              }).start();
-            },
-          })}
-        ></Tab.Screen>
-      </Tab.Navigator>
-
+      <Tab.Screen
+        name={"ProfileStack"}
+        component={ProfileStackScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                // centring Tab Button...
+                position: "absolute",
+                top: 20,
+              }}
+            >
+              <FontAwesome5
+                name="user-alt"
+                size={22}
+                color={focused ? "#2E2EFF" : "gray"}
+              ></FontAwesome5>
+            </View>
+          ),
+        }}
+        listeners={({ navigation, route }) => ({
+          // Onpress Update....
+          tabPress: (e) => {
+            Animated.spring(tabOffsetValue, {
+              toValue: getWidth() * 3.88,
+              useNativeDriver: true,
+            }).start();
+          },
+        })}
+      ></Tab.Screen>
+    </Tab.Navigator>
   );
 }
 
