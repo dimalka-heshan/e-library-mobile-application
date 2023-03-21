@@ -19,7 +19,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 
-import Books from "../screens/User/Books/Books";
+import HomeScreen from "../screens/User/Books/HomeScreen";
 
 import Profile from "../screens/User/Profile/Profile";
 
@@ -37,8 +37,8 @@ function BooksStackScreen() {
   return (
     <BooksStack.Navigator>
       <BooksStack.Screen
-        name="Books"
-        component={Books}
+        name="HomeScreen"
+        component={HomeScreen}
         options={{
           headerShown: false,
         }}
