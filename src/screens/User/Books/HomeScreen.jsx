@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -26,37 +25,57 @@ export default function HomeScreen() {
   const [catergoryIndex, setCategoryIndex] = useState(0);
   const navigation = useNavigation();
 
-  const categories = ["All", "Navels", "Educational", "Fantasy"];
+  const categories = [
+    "All",
+    "Navels",
+    "Educational",
+    "Fantasy",
+    "Fantasy",
+    "Fantasy",
+  ];
 
   const CategoryList = () => {
     return (
       <View style={style.categoryContainer}>
-        {categories.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            activeOpacity={0.8}
-            onPress={() => setCategoryIndex(index)}
-          >
-            <Text
-              style={[
-                style.categoryText,
-                catergoryIndex === index && style.categoryTextSelected,
-              ]}
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {categories.map((item, index) => (
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginHorizontal: 20,
+              }}
             >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.8}
+                onPress={() => setCategoryIndex(index)}
+              >
+                <Text
+                  style={[
+                    style.categoryText,
+                    catergoryIndex === index && style.categoryTextSelected,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   };
 
   const Card = ({ book }) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("BookScreen")}>
+      <TouchableOpacity
+        key={book.id}
+        onPress={() => navigation.navigate("BookScreen")}
+      >
         <View style={style.card}>
-          <View style={{ alignItems: "flex-end" }}></View>
-
           <View
             style={{
               height: "76%",
@@ -112,7 +131,6 @@ export default function HomeScreen() {
           columnWrapperStyle={{ justifyContent: "space-between" }}
           showsVerticalScrollIndicator={false}
           width={"100%"}
-          height={"100%"}
           numColumns={2}
           data={TempBooks}
           renderItem={({ item }) => {
@@ -135,7 +153,7 @@ const style = StyleSheet.create({
 
   categoryContainer: {
     flexDirection: "row",
-    marginTop: "7%",
+    marginTop: "4%",
     marginBottom: "5%",
     justifyContent: "space-between",
     paddingHorizontal: "4%",
