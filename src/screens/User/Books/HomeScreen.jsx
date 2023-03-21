@@ -51,11 +51,9 @@ export default function HomeScreen() {
     );
   };
 
-  const Card = ({ plant }) => {
+  const Card = ({ book }) => {
     return (
-      <TouchableOpacity
-      // onPress={() => navigation.navigate("Book")}
-      >
+      <TouchableOpacity onPress={() => navigation.navigate("BookScreen")}>
         <View style={style.card}>
           <View style={{ alignItems: "flex-end" }}></View>
 
@@ -67,13 +65,13 @@ export default function HomeScreen() {
             }}
           >
             <Image
-              source={plant.img}
+              source={book.img}
               style={{ flex: 1, resizeMode: "contain" }}
             />
           </View>
 
           <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 10 }}>
-            {plant.name}
+            {book.name}
           </Text>
           <View
             style={{
@@ -81,7 +79,7 @@ export default function HomeScreen() {
             }}
           >
             <Text style={{ fontSize: 13, fontWeight: "bold" }}>
-              {plant.price}
+              {book.price}
             </Text>
           </View>
         </View>
@@ -118,7 +116,7 @@ export default function HomeScreen() {
           numColumns={2}
           data={TempBooks}
           renderItem={({ item }) => {
-            return <Card plant={item} />;
+            return <Card book={item} />;
           }}
         />
       </View>
