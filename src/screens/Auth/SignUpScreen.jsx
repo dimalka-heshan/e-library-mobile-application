@@ -17,9 +17,19 @@ import {
 } from "react-native-responsive-dimensions";
 import COLORS from "../../constants/color";
 import SignUp from "../../assets/images/SignUp.png";
+import CustomTextInput from "../../components/CustomTextInput/CustomTextInout";
 
 const SignUpScreen = () => {
   const [uploadStatus, setUploadStatus] = useState("Choose Profile Picture");
+  const [image, setImage] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [validationErrors, setValidationErrors] = useState({
+    password: "password is required",
+  });
+  const [error, setError] = useState("Something went wrong");
 
   const navigation = useNavigation();
 
@@ -36,17 +46,44 @@ const SignUpScreen = () => {
           <View style={styles.textInputContainer}>
             <Text style={styles.header}>Sign Up</Text>
             <View style={styles.loginContainer}>
-              <TextInput style={styles.textInput} placeholder="Full Name" />
-              <TextInput style={styles.textInput} placeholder="Email" />
-              <TextInput
-                style={styles.textInput}
+              <CustomTextInput
+                placeholder="Full Name"
+                onChangeText={setFullName}
+              />
+              {validationErrors.fullName ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.fullName}
+                </Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput placeholder="Email" onChangeText={setEmail} />
+
+              {validationErrors.email ? (
+                <Text style={styles.errorText}>{validationErrors.email}</Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput
                 placeholder="Password"
                 secureTextEntry={true}
+                onChangeText={setPassword}
               />
-              <TextInput
-                style={styles.textInput}
+
+              {validationErrors.password ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.password}
+                </Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput
                 placeholder="Confirm Password"
                 secureTextEntry={true}
+                onChangeText={setConfirmPassword}
               />
 
               <View style={styles.imageUploadField}>
@@ -61,6 +98,27 @@ const SignUpScreen = () => {
                   <Text style={styles.uploadTxt}>Upload</Text>
                 </TouchableOpacity>
               </View>
+              {error ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "red",
+                    borderRadius: 10,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+                  >
+                    {error}
+                  </Text>
+                </View>
+              ) : (
+                ""
+              )}
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.loginButton}>
@@ -204,5 +262,15 @@ const styles = StyleSheet.create({
   uploadTxt: {
     color: "black",
     fontWeight: "bold",
+  },
+
+  errorText: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-4%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
   },
 });

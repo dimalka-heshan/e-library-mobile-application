@@ -8,14 +8,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/core";
+import React, { useState, useEffect } from "react";
 import {
   responsiveHeight,
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 import COLORS from "../../constants/color";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //images
 import Login from "../../assets/images/Login.png";
@@ -24,9 +24,46 @@ import CustomTextInput from "../../components/CustomTextInput/CustomTextInout";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("Invalid Email");
+  const [error, setError] = useState("");
 
-  const handleLogin = async () => {};
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((token) => {
+      if (token) {
+        AsyncStorage.getItem("role").then((role) => {
+          if (role === "admin") {
+            navigation.push("AdminTabs");
+          } else if (role === "user") {
+            navigation.push("UserTabs");
+          }
+        });
+      }
+    });
+  }, []);
+
+  // Login Function
+  const handleLogin = async () => {
+    await axios
+      .post("/auth/login", {
+        email,
+        password,
+      })
+      .then((res) => {
+        if (res.data.role === "admin") {
+          AsyncStorage.setItem("token", res.data.token);
+          AsyncStorage.setItem("role", res.data.role);
+          navigation.push("AdminTabs");
+        } else if (res.data.role === "user") {
+          AsyncStorage.setItem("token", res.data.token);
+          AsyncStorage.setItem("role", res.data.role);
+          navigation.push("UserTabs");
+        } else {
+          setError("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        setError(err.response.data.message);
+      });
+  };
 
   return (
     <ScrollView>
@@ -53,7 +90,7 @@ const LoginScreen = ({ navigation }) => {
                 <View
                   style={{
                     width: "100%",
-                    height: "12%",
+                    height: 40,
                     backgroundColor: "red",
                     borderRadius: 10,
                     alignContent: "center",
@@ -73,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                  onPress={() => navigation.push("UserTabs")}
+                  onPress={handleLogin}
                   style={styles.loginButton}
                 >
                   <Text style={styles.loginButtonText}>Login</Text>
