@@ -10,6 +10,9 @@ import {
   Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+// import { Video } from "expo-av";
+// import { YoutubePlayer } from "react-native-youtube-iframe";
+// import { VideoPlayer } from "react-native-video";
 import truncate from "truncate";
 import COLORS from "../consts/colors";
 
@@ -171,12 +174,18 @@ const BlogContent = ({ navigation, route }) => {
 
           {/* <View>
             <VideoPlayer
-              video={{
-                uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+              videoProps={{
+                shouldPlay: false,
+                source: {
+                  uri: "https://www.youtube.com/watch?v=0S5a0e7jwlU",
+                },
               }}
-              videoWidth={1600}
-              videoHeight={900}
-              thumbnail={{ uri: "https://i.picsum.photos/id/866/1600/900.jpg" }}
+              style={{
+                width: "100%",
+                height: 300,
+                borderRadius: 10,
+                marginTop: 10,
+              }}
             />
           </View> */}
 
