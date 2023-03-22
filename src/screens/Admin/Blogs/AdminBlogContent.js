@@ -8,6 +8,8 @@ import {
   Text,
   ScrollView,
   Image,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 // import { Video } from "expo-av";
@@ -61,12 +63,12 @@ const PopularCategories = [
   },
 ];
 
-const BlogContent = ({ navigation, route }) => {
+const AdminBlogContent = ({ navigation, route }) => {
   const place = route.params;
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
-      <ImageBackground style={{ flex: 0.7 }} source={place.image}>
+      <ImageBackground style={{ flex: 0.7, height: 400 }} source={place.image}>
         <View style={style.header}>
           <Icon
             name="arrow-back-ios"
@@ -77,18 +79,26 @@ const BlogContent = ({ navigation, route }) => {
           {/* <Icon name="more-vert" size={28} color={COLORS.white} /> */}
         </View>
         <View style={style.imageDetails}>
-          <Text
+          <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+            <Text
+              style={{
+                width: "100%",
+                fontSize: 30,
+                fontWeight: "bold",
+                color: COLORS.white,
+                marginBottom: 20,
+              }}
+            >
+              {place.name}
+            </Text>
+          </ScrollView>
+          <View
             style={{
-              width: "70%",
-              fontSize: 30,
-              fontWeight: "bold",
-              color: COLORS.white,
-              marginBottom: 20,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
             }}
           >
-            {place.name}
-          </Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Image
               style={{ height: 25, width: 25, borderRadius: 25 }}
               source={{
@@ -111,39 +121,71 @@ const BlogContent = ({ navigation, route }) => {
               </Text>
             </View>
           </View>
+
+          {/* Edit delete buttons */}
+          <View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 10,
+                justifyContent: "flex-end",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => navigation.navigate("EditBlog")}
+                style={{
+                  backgroundColor: COLORS.grey,
+                  padding: 5,
+                  borderRadius: 10,
+                  marginRight: 10,
+                }}
+              >
+                <Icon name="edit" size={20} color={COLORS.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  Alert.alert(
+                    "Delete",
+                    "Are you sure want to delete this blog?",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Delete",
+                        onPress: () => console.log("OK Pressed"),
+                      },
+                    ]
+                  )
+                }
+                style={{
+                  backgroundColor: COLORS.grey,
+                  padding: 5,
+                  borderRadius: 10,
+                  marginRight: 10,
+                }}
+              >
+                <Icon name="delete" size={20} color={COLORS.red} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ImageBackground>
 
       <ScrollView
         vertical={true}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         style={style.detailsContainer}
       >
         <View
           style={{
             paddingHorizontal: 10,
-            paddingBottom: 100,
+            paddingBottom: 200,
           }}
         >
-          {/* <View style={style.iconContainer}>
-            <Icon name="favorite" color={COLORS.red} size={30} />
-          </View> */}
-          {/* <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <Icon name="place" size={28} color={COLORS.primary} />
-            <Text
-              style={{
-                marginLeft: 5,
-                fontSize: 20,
-                fontWeight: "bold",
-                color: COLORS.primary,
-              }}
-            >
-              {place.location}
-            </Text>
-          </View>
-          <Text style={{ marginTop: 20, fontWeight: "bold", fontSize: 20 }}>
-            About the trip
-          </Text> */}
           <Text
             style={{
               marginTop: 20,
@@ -171,24 +213,6 @@ const BlogContent = ({ navigation, route }) => {
               </Text>
             </View>
           </View>
-
-          {/* <View>
-            <VideoPlayer
-              videoProps={{
-                shouldPlay: false,
-                source: {
-                  uri: "https://www.youtube.com/watch?v=0S5a0e7jwlU",
-                },
-              }}
-              style={{
-                width: "100%",
-                height: 300,
-                borderRadius: 10,
-                marginTop: 10,
-              }}
-            />
-          </View> */}
-
           <>
             <Text
               style={
@@ -201,10 +225,7 @@ const BlogContent = ({ navigation, route }) => {
             >
               Similar Books
             </Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
+            <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
               <View style={style.categoryContainer}>
                 {PopularCategories.map((category, index) => (
                   <View
@@ -248,49 +269,10 @@ const BlogContent = ({ navigation, route }) => {
           </>
         </View>
       </ScrollView>
-      {/* <View style={style.footer}>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: COLORS.white,
-            }}
-          >
-            $100
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: COLORS.grey,
-              marginLeft: 2,
-            }}
-          >
-            /PER DAY
-          </Text>
-        </View>
-        <View style={style.bookNowBtn}>
-          <Text
-            style={{ color: COLORS.primary, fontSize: 16, fontWeight: "bold" }}
-          >
-            Book Now
-          </Text>
-        </View>
-      </View> */}
     </SafeAreaView>
   );
 };
 const style = StyleSheet.create({
-  bookNowBtn: {
-    height: 50,
-    width: 150,
-    backgroundColor: COLORS.white,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   iconContainer: {
     height: 60,
     width: 60,
@@ -303,7 +285,7 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   detailsContainer: {
-    top: -30,
+    top: 50,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingVertical: 40,
@@ -323,7 +305,7 @@ const style = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     position: "absolute",
-    bottom: 30,
+    top: 100,
   },
   footer: {
     flexDirection: "row",
@@ -348,4 +330,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default BlogContent;
+export default AdminBlogContent;

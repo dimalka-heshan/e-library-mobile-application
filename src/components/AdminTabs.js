@@ -21,7 +21,7 @@ import { useRef } from "react";
 
 import Books from "../screens/Admin/Books/Books";
 import Profile from "../screens/Admin/Profile/Profile";
-import Blogs from "../screens/Admin/Blogs/Blogs";
+import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
 import Advertisement from "../screens/Admin/Advertisements/Advertisements";
 
 const BlogsStack = createNativeStackNavigator();
@@ -75,8 +75,8 @@ function BlogsStackScreen() {
   return (
     <BlogsStack.Navigator>
       <BlogsStack.Screen
-        name="Blogs"
-        component={Blogs}
+        name="AdminBlogs"
+        component={AdminBlogs}
         options={{
           headerShown: false,
         }}

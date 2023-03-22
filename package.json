@@ -29,6 +29,7 @@
     "react-native-video": "^5.2.1",
     "react-native-video-player": "^0.14.0",
     "react-native-youtube-iframe": "^2.2.0",
+    "react-native-picker": "4.3.7",
     "truncate": "^3.0.0"
   },
   "devDependencies": {

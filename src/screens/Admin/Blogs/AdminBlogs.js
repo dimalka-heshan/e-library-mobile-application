@@ -17,7 +17,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
 import places from "../../../constants/places";
 const { width } = Dimensions.get("screen");
-const BlogScreen = ({ navigation }) => {
+const AdminBlogs = ({ navigation }) => {
   const categoryIcons = [
     <Icon name="flight" size={25} color={COLORS.primary} />,
     <Icon name="beach-access" size={25} color={COLORS.primary} />,
@@ -75,8 +75,8 @@ const BlogScreen = ({ navigation }) => {
         <Text
           style={
             style.sectionTitle && {
-              top: 50,
               bottom: 0,
+              marginTop: 20,
               left: 20,
               fontSize: 20,
               fontWeight: "bold",
@@ -132,7 +132,7 @@ const BlogScreen = ({ navigation }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("BlogContent", place)}
+        onPress={() => navigation.navigate("AdminBlogContent", place)}
       >
         <ImageBackground style={style.cardImage} source={place.image}>
           <Text
@@ -242,7 +242,17 @@ const BlogScreen = ({ navigation }) => {
             objectFit: "cover",
           }}
         />
-        <Icon name="notifications-none" size={28} color={COLORS.white} />
+        <Image
+          source={{
+            uri: "https://cdn.shopify.com/s/files/1/1045/8368/files/Young-blonde-lady-smiling-wearing-round-tortoise-shell-acetate-eyeglasses-frame.jpg?v=1654863352",
+          }}
+          style={{
+            width: 50,
+            height: 50,
+            objectFit: "cover",
+            borderRadius: 50,
+          }}
+        />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
@@ -262,7 +272,7 @@ const BlogScreen = ({ navigation }) => {
                 }
               }
             >
-              Explore, New Blogs
+              Blogs & Articles
             </Text>
             <Text
               style={
@@ -273,7 +283,7 @@ const BlogScreen = ({ navigation }) => {
                 }
               }
             >
-              with Digital Library
+              Admin Panel
             </Text>
             <View style={style.inputContainer}>
               <Icon name="search" size={24} />
@@ -284,8 +294,31 @@ const BlogScreen = ({ navigation }) => {
             </View>
           </View>
         </View>
-        <ListCategories />
-        <Text style={style.sectionTitle}>Featured Blogs</Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 30,
+          }}
+        >
+          <Text style={style.sectionTitle}>Featured Blogs</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AddBlog")}
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 20,
+              backgroundColor: COLORS.primary,
+              padding: 5,
+              borderRadius: 10,
+              marginRight: 20,
+            }}
+          >
+            <Icon name="add" size={20} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
         <View>
           <FlatList
             contentContainerStyle={{ paddingLeft: 20 }}
@@ -297,12 +330,13 @@ const BlogScreen = ({ navigation }) => {
           <Text style={style.sectionTitle}>Recently Added Blogs</Text>
           <FlatList
             snapToInterval={width - 20}
-            contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
+            contentContainerStyle={{ paddingLeft: 20 }}
             showsHorizontalScrollIndicator={false}
             horizontal
             data={places}
             renderItem={({ item }) => <RecommendedCard place={item} />}
           />
+          <ListCategories />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -336,10 +370,11 @@ const style = StyleSheet.create({
     elevation: 12,
   },
   categoryContainer: {
-    marginTop: 70,
+    marginTop: 20,
     marginHorizontal: 20,
     flexDirection: "row",
     gap: 20,
+    paddingBottom: 100,
   },
   iconContainer: {
     height: 60,
@@ -372,4 +407,4 @@ const style = StyleSheet.create({
     padding: 10,
   },
 });
-export default BlogScreen;
+export default AdminBlogs;

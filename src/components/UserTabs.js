@@ -31,6 +31,10 @@ import BlogContent from "../screens/User/Blogs/BlogContent";
 
 import Advertisement from "../screens/User/Advertisements/Advertisements";
 import AdvertisementDetails from "../screens/User/Advertisements/AdvertisementDetails";
+import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
+import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
+import AddBlog from "../screens/Admin/Blogs/AddBlog";
+import EditBlog from "../screens/Admin/Blogs/EditBlog";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -97,7 +101,7 @@ function AdvertisementStackScreen() {
 function BlogsStackScreen() {
   return (
     <BlogsStack.Navigator>
-      <BlogsStack.Screen
+      {/* <BlogsStack.Screen
         name="Blogs"
         component={Blogs}
         options={{
@@ -108,6 +112,37 @@ function BlogsStackScreen() {
       <BlogsStack.Screen
         name="BlogContent"
         component={BlogContent}
+        options={{
+          headerShown: false,
+        }}
+      /> */}
+      <BlogsStack.Screen
+        name="AdminBlogs"
+        component={AdminBlogs}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AdminBlogContent"
+        component={AdminBlogContent}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AddBlog"
+        component={AddBlog}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="EditBlog"
+        component={EditBlog}
         options={{
           headerShown: false,
         }}
