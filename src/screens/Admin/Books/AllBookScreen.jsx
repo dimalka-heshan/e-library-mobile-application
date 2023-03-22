@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   KeyboardAvoidingView,
+  TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import React from "react";
@@ -93,18 +94,30 @@ const AllBookScreen = ({ navigation }) => {
                   marginLeft: "5%",
                 }}
               >
-                <Icon name="edit" size={28} color={COLORS.blue} />
-                <Icon
-                  name="delete"
-                  size={28}
-                  color="red"
-                  style={{
-                    marginLeft: "5%",
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.push("UpdateBookScreen");
                   }}
-                />
+                >
+                  <Icon name="edit" size={28} color={COLORS.blue} />
+                </TouchableOpacity>
+
+                <TouchableOpacity>
+                  <Icon
+                    name="delete"
+                    size={28}
+                    color="red"
+                    style={{
+                      marginLeft: "5%",
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           ))}
+          <TouchableOpacity onPress={() => navigation.push("AddBookScreen")}>
+            <Icon name="add" size={30} style={{ marginLeft: "80%" }} />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
