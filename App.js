@@ -1,6 +1,8 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import axios from "axios";
+import constants from "./src/constants/constants";
 
 import UserTabs from "./src/components/UserTabs";
 import AdminTabs from "./src/components/AdminTabs";
@@ -11,6 +13,8 @@ import SignUpScreen from "./src/screens/Auth/SignUpScreen";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  axios.defaults.baseURL = constants.API.PREFIX;
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

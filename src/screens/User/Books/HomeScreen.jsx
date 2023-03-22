@@ -21,18 +21,25 @@ import {
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 
-export default function HomeScreen() {
-  const [catergoryIndex, setCategoryIndex] = useState(0);
-  const navigation = useNavigation();
+const categories = [
+  "All",
+  "Classics",
+  "Novel",
+  "Educational",
+  "Detective",
+  "Fantasy",
+  "Short Stories",
+  "Horror",
+  "Mystery",
+  "Non-Fiction",
+  "Romance",
+];
 
-  const categories = [
-    "All",
-    "Navels",
-    "Educational",
-    "Fantasy",
-    "Fantasy",
-    "Fantasy",
-  ];
+export default function HomeScreen({ navigation }) {
+  const [catergoryIndex, setCategoryIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  console.log(selectedCategory);
 
   const CategoryList = () => {
     return (
@@ -51,7 +58,14 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={index}
                 activeOpacity={0.8}
-                onPress={() => setCategoryIndex(index)}
+                onPress={() => {
+                  setCategoryIndex(index);
+                  if (index === 0) {
+                    setSelectedCategory("");
+                  } else {
+                    setSelectedCategory(item);
+                  }
+                }}
               >
                 <Text
                   style={[
@@ -211,5 +225,6 @@ const style = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: 100,
   },
 });

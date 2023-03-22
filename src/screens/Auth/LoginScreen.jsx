@@ -1,28 +1,32 @@
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
   TouchableOpacity,
-  Alert,
   Image,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import {
   responsiveHeight,
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 import COLORS from "../../constants/color";
+import axios from "axios";
 
 //images
 import Login from "../../assets/images/Login.png";
+import CustomTextInput from "../../components/CustomTextInput/CustomTextInout";
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
+const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("Invalid Email");
+
+  const handleLogin = async () => {};
 
   return (
     <ScrollView>
@@ -37,12 +41,35 @@ const LoginScreen = () => {
           <View style={styles.textInputContainer}>
             <Text style={styles.header}>Login</Text>
             <View style={styles.loginContainer}>
-              <TextInput style={styles.textInput} placeholder="Email" />
-              <TextInput
-                style={styles.textInput}
+              <CustomTextInput placeholder="Email" onChangeText={setEmail} />
+
+              <CustomTextInput
                 placeholder="Password"
                 secureTextEntry={true}
+                onChangeText={setPassword}
               />
+
+              {error ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: "12%",
+                    backgroundColor: "red",
+                    borderRadius: 10,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+                  >
+                    {error}
+                  </Text>
+                </View>
+              ) : (
+                ""
+              )}
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -125,7 +152,7 @@ const styles = StyleSheet.create({
 
   LogoImage: {
     width: responsiveWidth(80),
-    height: responsiveHeight(39),
+    height: responsiveHeight(35),
     resizeMode: "contain",
     marginTop: responsiveHeight(8),
     alignContent: "center",

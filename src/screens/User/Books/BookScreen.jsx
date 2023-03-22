@@ -65,6 +65,7 @@ const BookScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             </View>
+
             <View
               style={{
                 flexDirection: "row",
@@ -81,17 +82,18 @@ const BookScreen = ({ navigation }) => {
               >
                 {book.price}
               </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "bold",
-                  color: COLORS.blue,
-                  marginTop: 1,
-                }}
-                onPress={() => {}}
-              >
-                {"View Feedback >>"}
-              </Text>
+              <TouchableOpacity onPress={() => {}}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "bold",
+                    color: COLORS.blue,
+                    marginTop: 1,
+                  }}
+                >
+                  {"View Feedback >>"}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
           <Text
@@ -121,6 +123,15 @@ const BookScreen = ({ navigation }) => {
                 }}
               >
                 {book.about}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  marginTop: 2,
+                  fontWeight: "bold",
+                }}
+              >
+                {"Category: (Fantacy, Romance)"}
               </Text>
             </View>
           </ScrollView>
