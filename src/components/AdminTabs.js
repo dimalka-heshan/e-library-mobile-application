@@ -19,10 +19,11 @@ import plus from "../../assets/plus.png";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 
-import Books from "../screens/Admin/Books/Books";
+import Books from "../screens/Admin/Books/AllBookScreen";
 import Profile from "../screens/Admin/Profile/Profile";
 import Blogs from "../screens/Admin/Blogs/Blogs";
 import Advertisement from "../screens/Admin/Advertisements/Advertisements";
+import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -33,8 +34,8 @@ function BooksStackScreen() {
   return (
     <BooksStack.Navigator>
       <BooksStack.Screen
-        name="Books"
-        component={Books}
+        name="AllBookScreen"
+        component={AllBookScreen}
         options={{
           headerShown: false,
         }}
