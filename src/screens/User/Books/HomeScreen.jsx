@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -22,41 +21,75 @@ import {
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 
-export default function HomeScreen() {
-  const [catergoryIndex, setCategoryIndex] = useState(0);
-  const navigation = useNavigation();
+const categories = [
+  "All",
+  "Classics",
+  "Novel",
+  "Educational",
+  "Detective",
+  "Fantasy",
+  "Short Stories",
+  "Horror",
+  "Mystery",
+  "Non-Fiction",
+  "Romance",
+];
 
-  const categories = ["All", "Navels", "Educational", "Fantasy"];
+export default function HomeScreen({ navigation }) {
+  const [catergoryIndex, setCategoryIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  console.log(selectedCategory);
 
   const CategoryList = () => {
     return (
       <View style={style.categoryContainer}>
-        {categories.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            activeOpacity={0.8}
-            onPress={() => setCategoryIndex(index)}
-          >
-            <Text
-              style={[
-                style.categoryText,
-                catergoryIndex === index && style.categoryTextSelected,
-              ]}
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {categories.map((item, index) => (
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                marginHorizontal: 20,
+              }}
             >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.8}
+                onPress={() => {
+                  setCategoryIndex(index);
+                  if (index === 0) {
+                    setSelectedCategory("");
+                  } else {
+                    setSelectedCategory(item);
+                  }
+                }}
+              >
+                <Text
+                  style={[
+                    style.categoryText,
+                    catergoryIndex === index && style.categoryTextSelected,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   };
 
   const Card = ({ book }) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("BookScreen")}>
+      <TouchableOpacity
+        key={book.id}
+        onPress={() => navigation.navigate("BookScreen")}
+      >
         <View style={style.card}>
-          <View style={{ alignItems: "flex-end" }}></View>
-
           <View
             style={{
               height: "76%",
@@ -112,7 +145,6 @@ export default function HomeScreen() {
           columnWrapperStyle={{ justifyContent: "space-between" }}
           showsVerticalScrollIndicator={false}
           width={"100%"}
-          height={"100%"}
           numColumns={2}
           data={TempBooks}
           renderItem={({ item }) => {
@@ -135,7 +167,7 @@ const style = StyleSheet.create({
 
   categoryContainer: {
     flexDirection: "row",
-    marginTop: "7%",
+    marginTop: "4%",
     marginBottom: "5%",
     justifyContent: "space-between",
     paddingHorizontal: "4%",
@@ -193,5 +225,6 @@ const style = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: 100,
   },
 });

@@ -7,9 +7,10 @@ import {
   Image,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/core";
 import {
   responsiveHeight,
   responsiveWidth,
@@ -17,11 +18,92 @@ import {
 } from "react-native-responsive-dimensions";
 import COLORS from "../../constants/color";
 import SignUp from "../../assets/images/SignUp.png";
+import CustomTextInput from "../../components/CustomTextInput/CustomTextInout";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
-const SignUpScreen = () => {
+const body = new FormData();
+
+const SignUpScreen = ({ navigation }) => {
   const [uploadStatus, setUploadStatus] = useState("Choose Profile Picture");
+  const [image, setImage] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const navigation = useNavigation();
+  // sign up handler
+  const handleSignUp = async () => {
+    setLoading(true);
+    if (password == confirmPassword) {
+      //constuct request body
+      body.append("fullName", fullName);
+      body.append("email", email);
+      body.append("password", password);
+      body.append("role", "user");
+      if (image) {
+        body.append("picture", {
+          uri: image,
+          type: "image/jpeg",
+          name: "image.jpg",
+        });
+      }
+
+      await axios
+        .post("/user/register", body)
+        .then((res) => {
+          console.log("res", res.data);
+          if (res.data) {
+            setLoading(false);
+            Alert.alert("Success", "User Registered Successfully", [
+              {
+                text: "OK",
+                onPress: () => navigation.navigate("LoginScreen"),
+              },
+            ]);
+          }
+        })
+        .catch((err) => {
+          if (err.response.status == 400) {
+            if (err.response.data.message != "Data validation error!") {
+              setLoading(false);
+              setError(err.response.data.message);
+            } else {
+              setError("");
+              setLoading(false);
+              setValidationErrors(err.response.data.data);
+            }
+          } else {
+            setLoading(false);
+            setError("Something went wrong!");
+          }
+        });
+    } else {
+      setLoading(false);
+      setError("Password and Confirm Password must be same !");
+    }
+  };
+
+  //for Image upload
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setUploadStatus("Book Picture Uploaded");
+    } else {
+      setImage(null);
+      setUploadStatus("Choose Book Picture");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -36,17 +118,44 @@ const SignUpScreen = () => {
           <View style={styles.textInputContainer}>
             <Text style={styles.header}>Sign Up</Text>
             <View style={styles.loginContainer}>
-              <TextInput style={styles.textInput} placeholder="Full Name" />
-              <TextInput style={styles.textInput} placeholder="Email" />
-              <TextInput
-                style={styles.textInput}
+              <CustomTextInput
+                placeholder="Full Name"
+                onChangeText={setFullName}
+              />
+              {validationErrors.fullName ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.fullName}
+                </Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput placeholder="Email" onChangeText={setEmail} />
+
+              {validationErrors.email ? (
+                <Text style={styles.errorText}>{validationErrors.email}</Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput
                 placeholder="Password"
                 secureTextEntry={true}
+                onChangeText={setPassword}
               />
-              <TextInput
-                style={styles.textInput}
+
+              {validationErrors.password ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.password}
+                </Text>
+              ) : (
+                ""
+              )}
+
+              <CustomTextInput
                 placeholder="Confirm Password"
                 secureTextEntry={true}
+                onChangeText={setConfirmPassword}
               />
 
               <View style={styles.imageUploadField}>
@@ -57,14 +166,45 @@ const SignUpScreen = () => {
                   selectTextOnFocus={false}
                   value={uploadStatus}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
+                <TouchableOpacity
+                  onPress={pickImage}
+                  style={styles.uploadButton}
+                >
                   <Text style={styles.uploadTxt}>Upload</Text>
                 </TouchableOpacity>
               </View>
+              {error ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "red",
+                    borderRadius: 10,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+                  >
+                    {error}
+                  </Text>
+                </View>
+              ) : (
+                ""
+              )}
 
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Sign Up</Text>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={handleSignUp}
+                >
+                  {loading ? (
+                    <ActivityIndicator size="small" color={COLORS.white} />
+                  ) : (
+                    <Text style={styles.loginButtonText}>Sign Up</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
@@ -204,5 +344,15 @@ const styles = StyleSheet.create({
   uploadTxt: {
     color: "black",
     fontWeight: "bold",
+  },
+
+  errorText: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-4%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
   },
 });

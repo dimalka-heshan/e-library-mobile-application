@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import {
   responsiveHeight,
@@ -9,12 +9,27 @@ const newLocal = "";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/core";
 import COLORS from "../../constants/color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //images
 const Logo = require("../../assets/images/Logo.png");
 
 const LandingScreen = () => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((token) => {
+      if (token) {
+        AsyncStorage.getItem("role").then((role) => {
+          if (role === "admin") {
+            navigation.push("AdminTabs");
+          } else if (role === "user") {
+            navigation.push("UserTabs");
+          }
+        });
+      }
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
