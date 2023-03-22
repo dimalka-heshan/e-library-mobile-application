@@ -26,6 +26,9 @@ import Advertisement from "../screens/Admin/Advertisements/Advertisements";
 import AddBookScreen from "../screens/Admin/Books/AddBookScreen";
 import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
 import UpdateBookScreen from "../screens/Admin/Books/UpdateBookScreen";
+import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
+import AddBlog from "../screens/Admin/Blogs/AddBlog";
+import EditBlog from "../screens/Admin/Blogs/EditBlog";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -96,6 +99,30 @@ function BlogsStackScreen() {
       <BlogsStack.Screen
         name="AdminBlogs"
         component={AdminBlogs}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AdminBlogContent"
+        component={AdminBlogContent}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AddBlog"
+        component={AddBlog}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="EditBlog"
+        component={EditBlog}
         options={{
           headerShown: false,
         }}

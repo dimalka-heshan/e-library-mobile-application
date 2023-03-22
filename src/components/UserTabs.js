@@ -101,7 +101,7 @@ function AdvertisementStackScreen() {
 function BlogsStackScreen() {
   return (
     <BlogsStack.Navigator>
-      {/* <BlogsStack.Screen
+      <BlogsStack.Screen
         name="Blogs"
         component={Blogs}
         options={{
@@ -112,37 +112,6 @@ function BlogsStackScreen() {
       <BlogsStack.Screen
         name="BlogContent"
         component={BlogContent}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
-      <BlogsStack.Screen
-        name="AdminBlogs"
-        component={AdminBlogs}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <BlogsStack.Screen
-        name="AdminBlogContent"
-        component={AdminBlogContent}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <BlogsStack.Screen
-        name="AddBlog"
-        component={AddBlog}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <BlogsStack.Screen
-        name="EditBlog"
-        component={EditBlog}
         options={{
           headerShown: false,
         }}

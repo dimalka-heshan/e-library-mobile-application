@@ -258,12 +258,13 @@ const style = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: COLORS.primary,
     flex: 0.3,
+    paddingTop: 100,
   },
   header: {
     marginTop: 60,
+    marginHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
   },
   imageDetails: {
     padding: 20,
