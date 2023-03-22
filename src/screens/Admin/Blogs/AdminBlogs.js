@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
-import places from "../../../constants/places";
 const { width } = Dimensions.get("screen");
 const AdminBlogs = ({ navigation }) => {
   const categoryIcons = [
@@ -69,6 +68,97 @@ const AdminBlogs = ({ navigation }) => {
         "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
     },
   ];
+
+  const dummyBlogs = [
+    {
+      id: 1,
+      blogTitle: "The Best Places to Visit in Sri Lanka",
+      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
+      blogCategory: "Nature",
+      blogAuthor: "John Doe",
+      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
+      publishedOn: "2021-07-01",
+      blogReference: "https://www.google.com",
+      similarBooks: [
+        {
+          id: 1,
+          bookName: "Sri Lanka Travel Guide",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+        {
+          id: 2,
+          bookName: "Lonely Planet Sri Lanka",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+      ],
+
+      blogContent:
+        "Sri Lanka is a small island country in the Indian Ocean, off the southern coast of India. It’s known for its beaches, diverse wildlife, ancient Buddhist ruins and tea plantations. Inland are mountains, rainforest and tea plantations, with Sigiriya, an ancient rock fortress, and the city of Kandy, Sri Lanka’s hill capital. The city of Galle is known for its fortified, Dutch-colonial buildings, and the city of Colombo has a busy shopping and nightlife scene.",
+    },
+    {
+      id: 2,
+      blogTitle: "The Best Places | China ",
+      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
+      blogCategory: "Econimics",
+      blogAuthor: "John Doe",
+      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
+      publishedOn: "2021-07-01",
+      blogReference: "https://www.google.com",
+      similarBooks: [
+        {
+          id: 1,
+          bookName: "Sri Lanka Travel Guide",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+        {
+          id: 2,
+          bookName: "Lonely Planet Sri Lanka",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+      ],
+      blogContent:
+        "China is the world’s most populous country, with a population of 1.4 billion. It’s also the world’s second-largest country by land area, with a territory that spans 9.6 million square kilometers (3.7 million square miles). China is a vast country with a long history and a rich culture. It’s also a country with a lot of diversity, from the deserts of the west to the mountains of the east, and from the subtropical islands of the south to the frozen tundra of the north.",
+    },
+    {
+      id: 3,
+      blogTitle: "The Best Places | India",
+      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
+      blogCategory: "Econimics",
+      blogAuthor: "John Doe",
+      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
+      publishedOn: "2021-07-01",
+      blogReference: "https://www.google.com",
+      similarBooks: [
+        {
+          id: 1,
+          bookName: "Sri Lanka Travel Guide",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+        {
+          id: 2,
+          bookName: "Lonely Planet Sri Lanka",
+          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+        },
+      ],
+      blogContent:
+        "India is a vast South Asian country with diverse terrain – from Himalayan peaks to Indian Ocean coastline – and history reaching back 5 millennia. In the north, Mughal Empire landmarks include Delhi’s Red Fort complex and massive Jama Masjid mosque, plus Agra’s iconic Taj Mahal mausoleum. Pilgrims bathe in the Ganges in Varanasi, and Rishikesh is a yoga center and base for Himalayan trekking. The country’s also famed for its vibrant cuisine, and its many religions and languages.",
+    },
+  ];
+
+  //Fetch all blogs from the database
+  const [allBlogs, setAllBlogs] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const getAllBlogs = async () => {
+    try {
+      const response = await axios("http://localhost:5000/blog/getAllBlogs");
+      setAllBlogs(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const ListCategories = () => {
     return (
       <>
@@ -128,13 +218,18 @@ const AdminBlogs = ({ navigation }) => {
     );
   };
 
-  const Card = ({ place }) => {
+  const Card = ({ dummyBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("AdminBlogContent", place)}
+        onPress={() => navigation.navigate("AdminBlogContent", dummyBlogs)}
       >
-        <ImageBackground style={style.cardImage} source={place.image}>
+        <ImageBackground
+          style={style.cardImage}
+          source={{
+            uri: dummyBlogs.blogImage,
+          }}
+        >
           <Text
             style={{
               color: COLORS.white,
@@ -143,11 +238,13 @@ const AdminBlogs = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {place.name}
+            {dummyBlogs.blogTitle}
           </Text>
           <View style={{ flexDirection: "row" }}>
             {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>October 21st</Text>
+            <Text style={{ color: COLORS.white }}>
+              {dummyBlogs.publishedOn}
+            </Text>
           </View>
           <View
             style={{
@@ -160,7 +257,7 @@ const AdminBlogs = ({ navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Icon name="category" size={20} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
-                {place.location}
+                {dummyBlogs.blogCategory}
               </Text>
             </View>
             {/* <View style={{ flexDirection: "row" }}>
@@ -173,9 +270,14 @@ const AdminBlogs = ({ navigation }) => {
     );
   };
 
-  const RecommendedCard = ({ place }) => {
+  const RecommendedCard = ({ dummyBlogs }) => {
     return (
-      <ImageBackground style={style.rmCardImage} source={place.image}>
+      <ImageBackground
+        style={style.rmCardImage}
+        source={{
+          uri: dummyBlogs.blogImage,
+        }}
+      >
         <Text
           style={{
             color: COLORS.white,
@@ -184,7 +286,7 @@ const AdminBlogs = ({ navigation }) => {
             marginTop: 10,
           }}
         >
-          {place.name}
+          {dummyBlogs.blogTitle}
         </Text>
         <View
           style={{
@@ -203,7 +305,7 @@ const AdminBlogs = ({ navigation }) => {
             >
               <Icon name="category" size={16} color={COLORS.white} />
               <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {place.location}
+                {dummyBlogs.blogCategory}
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -221,7 +323,7 @@ const AdminBlogs = ({ navigation }) => {
               textAlign: "justify",
             }}
           >
-            {place.details}
+            {dummyBlogs.blogContent}
           </Text>
         </View>
       </ImageBackground>
@@ -324,8 +426,8 @@ const AdminBlogs = ({ navigation }) => {
             contentContainerStyle={{ paddingLeft: 20 }}
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={places}
-            renderItem={({ item }) => <Card place={item} />}
+            data={dummyBlogs}
+            renderItem={({ item }) => <Card dummyBlogs={item} />}
           />
           <Text style={style.sectionTitle}>Recently Added Blogs</Text>
           <FlatList
@@ -333,8 +435,8 @@ const AdminBlogs = ({ navigation }) => {
             contentContainerStyle={{ paddingLeft: 20 }}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={places}
-            renderItem={({ item }) => <RecommendedCard place={item} />}
+            data={dummyBlogs}
+            renderItem={({ item }) => <RecommendedCard dummyBlogs={item} />}
           />
           <ListCategories />
         </View>

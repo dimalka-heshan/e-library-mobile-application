@@ -14,11 +14,12 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 // import { Picker } from "@react-native-picker/picker";
 
 const AddBlog = ({ navigation }) => {
   const route = useRoute();
+  const navigate = useNavigation();
 
   //Async store token
   const [Token, setToken] = useState("");
@@ -36,6 +37,72 @@ const AddBlog = ({ navigation }) => {
   const [blogContent, setBlogContent] = React.useState("");
   const [blogImage, setBlogImage] = React.useState("");
   const [blogCategory, setBlogCategory] = React.useState("");
+  const [blogReference, setBlogReference] = React.useState("");
+  const [blogAuthor, setBlogAuthor] = React.useState("");
+  const [blogAuthorImage, setBlogAuthorImage] = React.useState("");
+  const [similarBooks, setSimilarBooks] = React.useState([
+    {
+      bookId: "",
+      bookTitle: "",
+      bookImage: "",
+    },
+  ]);
+
+  const publishBlog = async () => {
+    if (
+      blogTitle === "" ||
+      blogContent === "" ||
+      blogImage === "" ||
+      blogCategory === ""
+    ) {
+      alert("Please fill all the fields");
+      return;
+    } else if (blogTitle.length < 5) {
+      alert("Blog Title should be atleast 5 characters long");
+      return;
+    } else if (blogTitle.length > 50) {
+      alert("Blog Title should be less than 50 characters long");
+      return;
+    } else if (blogContent.length < 100) {
+      alert("Blog Content should be atleast 100 characters long");
+      return;
+    } else if (blogContent.length > 10000) {
+      alert("Blog Content should be less than 10000 characters long");
+      return;
+    } else {
+      try {
+        const data = {
+          blogTitle: blogTitle,
+          blogContent: blogContent,
+          blogImage: blogImage,
+          blogCategory: blogCategory,
+          blogReference: blogReference,
+          blogAuthor: blogAuthor,
+          blogAuthorImage: blogAuthorImage,
+          similarBooks: similarBooks,
+        };
+        console.log(data);
+
+        axios
+          .post("http://localhost:5000/api/blogs/add", data, {
+            headers: {
+              Authorization: `Bearer ${Token}`,
+            },
+          })
+          .then((res) => {
+            console.log(res.data);
+            alert("Blog Published Successfully");
+            navigate.push("AdminBlogs");
+          })
+          .catch((err) => {
+            console.log(err);
+            alert("Error Publishing Blog");
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
 
   const [uploadStatus, setUploadStatus] = useState("Choose Blog Image");
   return (
@@ -102,25 +169,35 @@ const AddBlog = ({ navigation }) => {
                   letterSpacing: 1,
                 }}
               >
-                New Blog
+                Publish Blog
               </Text>
             </View>
             <View style={style.loginContainer}>
-              <TextInput style={style.textInput} placeholder="Blog Title" />
-              <TextInput style={style.textInput} placeholder="Category" />
+              <TextInput
+                style={style.textInput}
+                placeholder="Blog Title"
+                onChangeText={(text) => setBlogTitle(text)}
+              />
+              <TextInput
+                style={style.textInput}
+                placeholder="Category"
+                onChangeText={(text) => setBlogCategory(text)}
+              />
               <TextInput
                 style={style.textArea}
                 multiline={true}
                 numberOfLines={10}
                 placeholder="Blog Content"
+                onChangeText={(text) => setBlogContent(text)}
               />
               <TextInput
                 style={style.textArea}
                 multiline={true}
                 numberOfLines={10}
+                onChangeText={(text) => setBlogReference(text)}
                 placeholder="Add Reference Links (Optional)"
               />
-              <Picker
+              {/* <Picker
                 selectedValue={blogCategory}
                 style={style.textInput}
                 onValueChange={(itemValue, itemIndex) =>
@@ -131,7 +208,7 @@ const AddBlog = ({ navigation }) => {
                 <Picker.Item label="Technology" value="Technology" />
                 <Picker.Item label="Education" value="Education" />
                 <Picker.Item label="Health" value="Health" />
-              </Picker>
+              </Picker> */}
               <View style={style.imageUploadField}>
                 <TextInput
                   style={style.ImageTextInput}
@@ -148,7 +225,7 @@ const AddBlog = ({ navigation }) => {
 
               <View style={style.buttonContainer}>
                 <TouchableOpacity
-                  //   onPress={() => navigation.push("UserTabs")}
+                  onPress={publishBlog}
                   style={style.loginButton}
                 >
                   <Text style={style.loginButtonText}>Publish</Text>
