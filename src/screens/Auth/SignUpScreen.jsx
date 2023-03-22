@@ -53,9 +53,12 @@ const SignUpScreen = ({ navigation }) => {
       }
 
       await axios
-        .post("/user/register", body)
+        .post("/user/register", body, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((res) => {
-          console.log("res", res.data);
           if (res.data) {
             setLoading(false);
             Alert.alert("Success", "User Registered Successfully", [
