@@ -112,7 +112,10 @@ const SignUpScreen = ({ navigation }) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
     >
-      <ScrollView>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View>
             <Image source={SignUp} style={styles.LogoImage} />

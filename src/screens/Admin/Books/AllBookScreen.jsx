@@ -59,6 +59,8 @@ const AllBookScreen = ({ navigation }) => {
           height: "100%",
           marginTop: "5%",
         }}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
           {TempBooks.map((book) => (
