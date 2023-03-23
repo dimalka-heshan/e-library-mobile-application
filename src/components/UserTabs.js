@@ -23,6 +23,9 @@ import { useRef } from "react";
 import HomeScreen from "../screens/User/Books/HomeScreen";
 import BookScreen from "../screens/User/Books/BookScreen";
 
+import BookFeedback from "../screens/User/Feedbacks/BookFeedback";
+import createFeedback from "../screens/User/Feedbacks/CreateFeedback"
+
 import Profile from "../screens/User/Profile/Profile";
 
 import Blogs from "../screens/User/Blogs/Blogs";
@@ -53,6 +56,23 @@ function BooksStackScreen() {
           headerShown: false,
         }}
       />
+
+      <BooksStack.Screen
+        name="BookFeedback"
+        component={BookFeedback}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BooksStack.Screen
+        name="createFeedback"
+        component={createFeedback}
+        options={{
+          headerShown: false,
+        }}
+      />
+
     </BooksStack.Navigator>
   );
 }

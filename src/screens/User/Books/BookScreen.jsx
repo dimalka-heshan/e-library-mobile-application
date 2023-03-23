@@ -73,6 +73,7 @@ const BookScreen = ({ navigation }) => {
               }}
             >
               <Text
+              
                 style={{
                   fontSize: 15,
                   fontWeight: "bold",
@@ -82,7 +83,7 @@ const BookScreen = ({ navigation }) => {
               >
                 {book.price}
               </Text>
-              <TouchableOpacity onPress={() => {}}>
+              <TouchableOpacity onPress={() => navigation.navigate("BookFeedback")}>
                 <Text
                   style={{
                     fontSize: 15,
