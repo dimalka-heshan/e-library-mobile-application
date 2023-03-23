@@ -45,6 +45,7 @@ export default function HomeScreen({ navigation }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("");
+  const [search, setSearch] = useState("");
 
   const GetAllData = async () => {
     setLoading(true);
@@ -59,6 +60,27 @@ export default function HomeScreen({ navigation }) {
       .catch((err) => {
         console.log(err);
         setLoading(false);
+      });
+  };
+
+  //book search function
+  const filterData = (books, searchKey) => {
+    const result = books.filter(
+      (book) =>
+        book.bookName.toLowerCase().includes(searchKey) ||
+        book.bookAuthor.toLowerCase().includes(searchKey)
+    );
+    setBooks(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get(`/book/getAllBooks/?category=${category}`)
+      .then((res) => {
+        filterData(res.data.filteredBooks, e.toLowerCase());
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -191,7 +213,11 @@ export default function HomeScreen({ navigation }) {
         <View style={{ marginTop: "5%", flexDirection: "row", padding: "3%" }}>
           <View style={style.searchContainer}>
             <Icon name="search" size={25} style={{ marginLeft: 20 }} />
-            <TextInput placeholder="Search" style={style.input} />
+            <TextInput
+              placeholder="Search"
+              style={style.input}
+              onChangeText={(text) => onSearch(text)}
+            />
           </View>
         </View>
         <CategoryList />
