@@ -45,6 +45,7 @@ const LoginScreen = ({ navigation }) => {
   // Login Function
   const handleLogin = async () => {
     setLoading(true);
+    setError("");
     await axios
       .post("/auth/login", {
         email,
