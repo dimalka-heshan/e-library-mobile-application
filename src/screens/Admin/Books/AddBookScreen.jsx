@@ -81,11 +81,11 @@ const AddBook = ({ navigation }) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [4, 12],
       quality: 1,
     });
 
     if (!result.canceled) {
-      console.log(result);
       setBookImage({
         uri: result.assets[0].uri,
         mimeType: "image/jpeg",
@@ -130,6 +130,8 @@ const AddBook = ({ navigation }) => {
           ]);
         })
         .catch((err) => {
+          console.log(JSON.stringify(err));
+
           if (err.response.status == 400) {
             if (err.response.data.message != "Data validation error!") {
               setError(err.response.data.message);

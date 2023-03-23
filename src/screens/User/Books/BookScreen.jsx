@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -54,7 +55,12 @@ const BookScreen = ({ navigation, route }) => {
                   alignItems: "flex-end",
                 }}
               >
-                <TouchableOpacity style={style.downloadButton}>
+                <TouchableOpacity
+                  style={style.downloadButton}
+                  onPress={() => {
+                    Linking.openURL(book.eBook);
+                  }}
+                >
                   <Icon name="file-download" size={20} color={COLORS.white} />
                 </TouchableOpacity>
               </View>
