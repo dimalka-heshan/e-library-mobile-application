@@ -7,15 +7,16 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/core";
+import React, { useState, useEffect } from "react";
 import {
   responsiveHeight,
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 import COLORS from "../../constants/color";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //images
 import Login from "../../assets/images/Login.png";
@@ -24,9 +25,52 @@ import CustomTextInput from "../../components/CustomTextInput/CustomTextInout";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("Invalid Email");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {};
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((token) => {
+      if (token) {
+        AsyncStorage.getItem("role").then((role) => {
+          if (role === "admin") {
+            navigation.push("AdminTabs");
+          } else if (role === "user") {
+            navigation.push("UserTabs");
+          }
+        });
+      }
+    });
+  }, []);
+
+  // Login Function
+  const handleLogin = async () => {
+    setLoading(true);
+    await axios
+      .post("/auth/login", {
+        email,
+        password,
+      })
+      .then((res) => {
+        if (res.data.role === "admin") {
+          AsyncStorage.setItem("token", res.data.token);
+          AsyncStorage.setItem("role", res.data.role);
+          setLoading(false);
+          navigation.push("AdminTabs");
+        } else if (res.data.role === "user") {
+          AsyncStorage.setItem("token", res.data.token);
+          AsyncStorage.setItem("role", res.data.role);
+          setLoading(false);
+          navigation.push("UserTabs");
+        } else {
+          setLoading(false);
+          setError("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(err.response.data.message);
+      });
+  };
 
   return (
     <ScrollView>
@@ -53,7 +97,7 @@ const LoginScreen = ({ navigation }) => {
                 <View
                   style={{
                     width: "100%",
-                    height: "12%",
+                    height: 40,
                     backgroundColor: "red",
                     borderRadius: 10,
                     alignContent: "center",
@@ -73,10 +117,14 @@ const LoginScreen = ({ navigation }) => {
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                  onPress={() => navigation.push("UserTabs")}
+                  onPress={handleLogin}
                   style={styles.loginButton}
                 >
-                  <Text style={styles.loginButtonText}>Login</Text>
+                  {loading ? (
+                    <ActivityIndicator size="small" color={COLORS.white} />
+                  ) : (
+                    <Text style={styles.loginButtonText}>Login</Text>
+                  )}
                 </TouchableOpacity>
               </View>
 
