@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import React from "react";
 import {
   ImageBackground,
@@ -19,53 +21,33 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import truncate from "truncate";
 import COLORS from "../../../constants/color";
 
-const PopularCategories = [
-  {
-    id: 1,
-    name: "History of Sri Lanka | ශ්‍රී ලංකාවේ ඉතිහාසය in Sinhala",
-    catImg:
-      "https://upload.wikimedia.org/wikipedia/commons/2/24/1686_Mallet_Map_of_Ceylon_or_Sri_Lanka_%28Taprobane%29_-_Geographicus_-_Taprobane-mallet-1686.jpg",
-  },
-  {
-    id: 2,
-    name: "Culture of South Asia by Dr. Nalin de Silva",
-    catImg:
-      "https://strategicpsychology.com.au/wp-content/uploads/Multicultural-character.jpg",
-  },
-  {
-    id: 3,
-    name: "Nature Conservation in Sri Lanka",
-    catImg:
-      "https://images.news18.com/ibnlive/uploads/2021/07/1627448017_world-nature-conservation-day.png",
-  },
-  {
-    id: 4,
-    name: "Adventure",
-    catImg:
-      "https://warnercnr.colostate.edu/wp-content/uploads/sites/2/2017/04/shutterstock_428626417-1024x683.jpg",
-  },
-  {
-    id: 5,
-    name: "Religion",
-    catImg:
-      "https://www.jobs.ca/content/uploads/2018/03/religion-and-business.jpg",
-  },
-  {
-    id: 6,
-    name: "Food",
-    catImg:
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
-  },
-  {
-    id: 7,
-    name: "Wildlife",
-    catImg:
-      "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
-  },
-];
-
 const AdminBlogContent = ({ navigation, route }) => {
   const allBlogs = route.params;
+
+  const [token, setToken] = React.useState("");
+  //Get token from local storage
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
+  //Delete blog from the database
+  const deleteBlog = () => {
+    axios
+      .delete(`/blog/deleteBlog/${allBlogs._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        Alert.alert("Success", "Blog deleted successfully", [
+          { text: "OK", onPress: () => navigation.push("AdminBlogs") },
+        ]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
@@ -162,7 +144,7 @@ const AdminBlogContent = ({ navigation, route }) => {
                       },
                       {
                         text: "Delete",
-                        onPress: () => console.log("OK Pressed"),
+                        onPress: () => deleteBlog(),
                       },
                     ]
                   )
@@ -220,7 +202,7 @@ const AdminBlogContent = ({ navigation, route }) => {
             </View>
           )}
 
-          {allBlogs.similarBooks.bookName && (
+          {allBlogs.similarBooks && (
             <View>
               <Text
                 style={

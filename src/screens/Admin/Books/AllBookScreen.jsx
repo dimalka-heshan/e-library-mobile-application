@@ -17,6 +17,7 @@ import {
 } from "react-native-responsive-dimensions";
 import COLORS from "../../../constants/color";
 import TempBooks from "../../../constants/book";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 
 const AllBookScreen = ({ navigation }) => {
   return (
@@ -51,12 +52,15 @@ const AllBookScreen = ({ navigation }) => {
           </View>
         </View>
       </View>
+
       <ScrollView
         style={{
           width: "100%",
           height: "100%",
           marginTop: "5%",
         }}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
           {TempBooks.map((book) => (

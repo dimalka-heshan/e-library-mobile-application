@@ -68,9 +68,8 @@ const AddBlog = ({ navigation }) => {
     if (!result.canceled) {
       setBlogImage({
         uri: result.assets[0].uri,
-        mimeType: `
-        ${result.assets[0].type}/jpg`,
-        imageName: "image.jpg",
+        name: "image.jpg",
+        mimetype: "image/jpeg",
       });
       setImageUploadStatus("Blog Image Uploaded");
     } else {
@@ -100,16 +99,22 @@ const AddBlog = ({ navigation }) => {
     getAllBooks();
   }, []);
 
+  console.log(validationErrors);
   //Publish blog
   const publishBlog = async () => {
+    setError("");
     body.append("blogTitle", blogTitle);
     body.append("blogContent", blogContent);
-    body.append("blogImage", blogImage);
+    body.append("blogBanner", blogImage);
     body.append("blogCategory", blogCategory);
     body.append("blogReference", blogReference);
-    body.append("similarBooks", similarBooks);
 
-    console.log(JSON.stringify(body));
+    if (selectedItems.length > 0) {
+      for (let i = 0; i < selectedItems.length; i++) {
+        body.append(`similarBooks[${i}]`, selectedItems[i]);
+      }
+    }
+
     await axios
       .post("/blog/createBlog", body, {
         headers: {
@@ -118,7 +123,6 @@ const AddBlog = ({ navigation }) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setLoading(false);
         Alert.alert("Success", "Blog Published Successfully", [
           {
@@ -128,71 +132,17 @@ const AddBlog = ({ navigation }) => {
         ]);
       })
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        console.log(JSON.stringify(err.response.data.data));
         if (err.response.status == 400) {
           if (err.response.data.message != "Data validation error!") {
-            setLoading(false);
             setError(err.response.data.message);
           } else {
-            setLoading(false);
-            setValidationErrors(err.response.data.errors);
+            setValidationErrors(err.response.data.data);
           }
         } else {
-          setLoading(false);
           setError("Something went wrong!");
         }
       });
-
-    // if (blogTitle.length < 5) {
-    //   setError("Blog title should be at least 5 characters");
-    //   return;
-    // } else if (blogTitle.length > 25) {
-    //   setError("Blog title should be less than 25 characters");
-    //   return;
-    // } else {
-    //   setLoading(true);
-    //   body.append("blogTitle", blogTitle);
-    //   body.append("blogContent", blogContent);
-    //   body.append("blogImage", blogImage);
-    //   body.append("blogCategory", blogCategory);
-    //   body.append("blogReference", blogReference);
-    //   body.append("similarBooks", similarBooks);
-
-    //   console.log(JSON.stringify(body));
-    //   await axios
-    //     .post("/blog/createBlog", body, {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     })
-    //     .then((res) => {
-    //       console.log(res.data);
-    //       setLoading(false);
-    //       Alert.alert("Success", "Blog Published Successfully", [
-    //         {
-    //           text: "OK",
-    //           onPress: () => navigation.navigate("AdminBlogs"),
-    //         },
-    //       ]);
-    //     })
-    //     .catch((err) => {
-    //       console.log(JSON.stringify(err));
-    //       if (err.response.status == 400) {
-    //         if (err.response.data.message != "Data validation error!") {
-    //           setLoading(false);
-    //           setError(err.response.data.message);
-    //         } else {
-    //           setError("");
-    //           setLoading(false);
-    //           setValidationErrors(err.response.data.data);
-    //         }
-    //       } else {
-    //         setLoading(false);
-    //         setError("Something went wrong!");
-    //       }
-    //     });
-    // }
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>

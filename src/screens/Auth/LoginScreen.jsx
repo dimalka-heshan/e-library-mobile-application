@@ -73,7 +73,10 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
       >

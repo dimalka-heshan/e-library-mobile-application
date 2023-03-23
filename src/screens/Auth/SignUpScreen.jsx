@@ -53,9 +53,12 @@ const SignUpScreen = ({ navigation }) => {
       }
 
       await axios
-        .post("/user/register", body)
+        .post("/user/register", body, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((res) => {
-          console.log("res", res.data);
           if (res.data) {
             setLoading(false);
             Alert.alert("Success", "User Registered Successfully", [
@@ -109,7 +112,10 @@ const SignUpScreen = ({ navigation }) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
     >
-      <ScrollView>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View>
             <Image source={SignUp} style={styles.LogoImage} />
