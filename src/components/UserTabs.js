@@ -128,6 +128,7 @@ export default function UserTabs() {
           // Shadow...
           shadowColor: "#000",
           shadowOpacity: 0.06,
+          shadowRadius: 10,
           shadowOffset: {
             width: 10,
             height: 10,
