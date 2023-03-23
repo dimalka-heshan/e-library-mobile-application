@@ -1,6 +1,6 @@
 const constants = {
   API: {
-    PREFIX: "http://localhost:8080",
+    PREFIX: "https://osprey-e-library-backend.herokuapp.com/api/v1",
   },
 };
 
