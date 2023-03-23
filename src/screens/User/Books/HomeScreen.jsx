@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,16 +10,21 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/core";
 const width = Dimensions.get("window").width / 2 - 30;
 import COLORS from "../../../constants/color";
 import TempBooks from "../../../constants/book";
+import LottieView from "lottie-react-native";
+
 import {
   responsiveHeight,
   responsiveWidth,
 } from "react-native-responsive-dimensions";
+import axios from "axios";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 
 const categories = [
   "All",
@@ -37,9 +42,45 @@ const categories = [
 
 export default function HomeScreen({ navigation }) {
   const [catergoryIndex, setCategoryIndex] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("");
 
-  console.log(selectedCategory);
+  const GetAllData = async () => {
+    setLoading(true);
+    await axios
+      .get(`/book/getAllBooks/?category=${category}`)
+      .then((res) => {
+        setTimeout(() => {
+          setBooks(res.data.filteredBooks);
+          setLoading(false);
+        }, 1000);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  const GetBooksByCategory = async (category) => {
+    setLoading(true);
+    await axios
+      .get(`/book/getAllBooks/?category=${category}`)
+      .then((res) => {
+        setTimeout(() => {
+          setBooks(res.data.filteredBooks);
+          setLoading(false);
+        }, 1000);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    GetAllData();
+  }, []);
 
   const CategoryList = () => {
     return (
@@ -61,9 +102,11 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => {
                   setCategoryIndex(index);
                   if (index === 0) {
-                    setSelectedCategory("");
+                    GetBooksByCategory("");
+                    setCategory("");
                   } else {
-                    setSelectedCategory(item);
+                    GetBooksByCategory(item);
+                    setCategory(item);
                   }
                 }}
               >
@@ -86,8 +129,8 @@ export default function HomeScreen({ navigation }) {
   const Card = ({ book }) => {
     return (
       <TouchableOpacity
-        key={book.id}
-        onPress={() => navigation.navigate("BookScreen")}
+        key={book._id}
+        onPress={() => navigation.navigate("BookScreen", book)}
       >
         <View style={style.card}>
           <View
@@ -98,21 +141,32 @@ export default function HomeScreen({ navigation }) {
             }}
           >
             <Image
-              source={book.img}
-              style={{ flex: 1, resizeMode: "contain" }}
+              source={{ uri: book.bookBanner }}
+              style={{
+                flex: 1,
+                resizeMode: "contain",
+                height: "100%",
+                width: "100%",
+              }}
             />
           </View>
 
-          <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 10 }}>
-            {book.name}
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 13,
+              marginTop: 10,
+            }}
+          >
+            {book.bookName}
           </Text>
           <View
             style={{
               marginTop: 5,
             }}
           >
-            <Text style={{ fontSize: 13, fontWeight: "bold" }}>
-              {book.price}
+            <Text style={{ fontSize: 11, fontWeight: "bold" }}>
+              {book.bookAuthor}
             </Text>
           </View>
         </View>
@@ -121,38 +175,69 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={style.mainContainer}>
-      <View style={style.header}>
-        <View>
-          <Text style={{ fontSize: 25, fontWeight: "bold" }}>Welcome to</Text>
-          <Text
-            style={{ fontSize: 38, color: COLORS.blue, fontWeight: "bold" }}
+    <>
+      <SafeAreaView style={style.mainContainer}>
+        <View style={style.header}>
+          <View>
+            <Text style={{ fontSize: 25, fontWeight: "bold" }}>Welcome to</Text>
+            <Text
+              style={{ fontSize: 38, color: COLORS.blue, fontWeight: "bold" }}
+            >
+              Osprey Library
+            </Text>
+          </View>
+          {/* <Icon name="shopping-cart" size={28} /> */}
+        </View>
+        <View style={{ marginTop: "5%", flexDirection: "row", padding: "3%" }}>
+          <View style={style.searchContainer}>
+            <Icon name="search" size={25} style={{ marginLeft: 20 }} />
+            <TextInput placeholder="Search" style={style.input} />
+          </View>
+        </View>
+        <CategoryList />
+        {books.length > 0 ? (
+          <View style={style.scrollItems}>
+            <FlatList
+              columnWrapperStyle={{ justifyContent: "space-between" }}
+              showsVerticalScrollIndicator={false}
+              width={"100%"}
+              numColumns={2}
+              data={books}
+              renderItem={({ item }) => {
+                return <Card book={item} />;
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              alignItems: "center",
+              marginTop: "40%",
+              justifyContent: "center",
+            }}
           >
-            Osprey Library
-          </Text>
-        </View>
-        {/* <Icon name="shopping-cart" size={28} /> */}
-      </View>
-      <View style={{ marginTop: "5%", flexDirection: "row", padding: "3%" }}>
-        <View style={style.searchContainer}>
-          <Icon name="search" size={25} style={{ marginLeft: 20 }} />
-          <TextInput placeholder="Search" style={style.input} />
-        </View>
-      </View>
-      <CategoryList />
-      <View style={style.scrollItems}>
-        <FlatList
-          columnWrapperStyle={{ justifyContent: "space-between" }}
-          showsVerticalScrollIndicator={false}
-          width={"100%"}
-          numColumns={2}
-          data={TempBooks}
-          renderItem={({ item }) => {
-            return <Card book={item} />;
-          }}
-        />
-      </View>
-    </SafeAreaView>
+            <LottieView
+              source={require("../../../assets/searching.json")}
+              autoPlay
+              loop
+              style={{ width: 100, height: 100 }}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+                color: "grey",
+                marginTop: 10,
+                alignItems: "center",
+              }}
+            >
+              No Books Found
+            </Text>
+          </View>
+        )}
+      </SafeAreaView>
+      {loading ? <CustomLoading /> : ""}
+    </>
   );
 }
 
@@ -173,6 +258,7 @@ const style = StyleSheet.create({
     paddingHorizontal: "4%",
   },
   categoryText: { fontSize: 16, color: "grey", fontWeight: "bold" },
+
   categoryTextSelected: {
     color: COLORS.blue,
     paddingBottom: "2%",
