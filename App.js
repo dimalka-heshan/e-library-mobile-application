@@ -43,6 +43,13 @@ export default function App() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="AdminTabs"
+          component={AdminTabs}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
