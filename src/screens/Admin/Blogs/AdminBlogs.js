@@ -74,7 +74,6 @@ const AdminBlogs = ({ navigation }) => {
 
   //Get logged in user details
   const [user, setUser] = React.useState([]);
-  // }, [user]);
   const getUserDetails = () => {
     setLoading(true);
     axios
@@ -86,9 +85,8 @@ const AdminBlogs = ({ navigation }) => {
       .then((res) => {
         setUser(res.data.user);
         setLoading(false);
-      }, 1000)
+      })
       .catch((err) => {
-        console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -106,7 +104,6 @@ const AdminBlogs = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -306,7 +303,9 @@ const AdminBlogs = ({ navigation }) => {
           />
           <Image
             source={{
-              uri: user.picture,
+              uri:
+                user.picture ||
+                "https://res.cloudinary.com/desnqqj6a/image/upload/v1667591378/user_1_bze4lv.png",
             }}
             style={{
               width: 50,

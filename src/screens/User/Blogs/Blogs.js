@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -12,19 +12,16 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
 import places from "../../../constants/places";
 const { width } = Dimensions.get("screen");
-const BlogScreen = ({ navigation }) => {
-  const categoryIcons = [
-    <Icon name="flight" size={25} color={COLORS.primary} />,
-    <Icon name="beach-access" size={25} color={COLORS.primary} />,
-    <Icon name="near-me" size={25} color={COLORS.primary} />,
-    <Icon name="place" size={25} color={COLORS.primary} />,
-  ];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
+const BlogScreen = ({ navigation }) => {
   const PopularCategories = [
     {
       id: 1,
@@ -69,6 +66,56 @@ const BlogScreen = ({ navigation }) => {
         "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
     },
   ];
+
+  const [token, setToken] = React.useState("");
+  //Get token from local storage
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
+
+  //Get logged in user details
+  const [user, setUser] = React.useState([]);
+  const getUserDetails = () => {
+    setLoading(true);
+    axios
+      .get("/user/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setUser(res.data.user);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        setLoading(false);
+      });
+  };
+
+  //Fetch all blogs from the database
+  const [allBlogs, setAllBlogs] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const getAllBlogs = () => {
+    setLoading(true);
+    axios
+      .get("/blog/getAllBlogs")
+      .then((res) => {
+        setAllBlogs(res.data.blogs);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    getUserDetails();
+    getAllBlogs();
+  }, []);
+
   const ListCategories = () => {
     return (
       <>
@@ -128,13 +175,18 @@ const BlogScreen = ({ navigation }) => {
     );
   };
 
-  const Card = ({ place }) => {
+  const Card = ({ allBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("BlogContent", place)}
+        onPress={() => navigation.navigate("BlogContent", allBlogs)}
       >
-        <ImageBackground style={style.cardImage} source={place.image}>
+        <ImageBackground
+          style={style.cardImage}
+          source={{
+            uri: allBlogs.blogImage,
+          }}
+        >
           <Text
             style={{
               color: COLORS.white,
@@ -143,11 +195,11 @@ const BlogScreen = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {place.name}
+            {allBlogs.blogTitle}
           </Text>
           <View style={{ flexDirection: "row" }}>
             {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>October 21st</Text>
+            <Text style={{ color: COLORS.white }}>{allBlogs.publishedOn}</Text>
           </View>
           <View
             style={{
@@ -160,152 +212,185 @@ const BlogScreen = ({ navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Icon name="category" size={20} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
-                {place.location}
+                {allBlogs.blogCategory}
               </Text>
             </View>
-            {/* <View style={{ flexDirection: "row" }}>
-              <Icon name="calendar" size={20} color={COLORS.white} />
-              <Text style={{ marginLeft: 5, color: COLORS.white }}>5.0</Text>
-            </View> */}
           </View>
         </ImageBackground>
       </TouchableOpacity>
     );
   };
 
-  const RecommendedCard = ({ place }) => {
+  const RecommendedCard = ({ allBlogs }) => {
     return (
-      <ImageBackground style={style.rmCardImage} source={place.image}>
-        <Text
-          style={{
-            color: COLORS.white,
-            fontSize: 22,
-            fontWeight: "bold",
-            marginTop: 10,
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("BlogContent", allBlogs)}
+      >
+        <ImageBackground
+          style={style.rmCardImage}
+          source={{
+            uri: allBlogs.blogImage,
           }}
         >
-          {place.name}
-        </Text>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-          }}
-        >
-          <View style={{ width: "100%", flexDirection: "row", marginTop: 10 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                marginRight: 10,
-                alignItems: "center",
-              }}
-            >
-              <Icon name="category" size={16} color={COLORS.white} />
-              <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {place.location}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Icon name="timer" size={16} color={COLORS.white} />
-              <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                1 hour ago
-              </Text>
-            </View>
-          </View>
           <Text
             style={{
               color: COLORS.white,
-              fontSize: 13,
-              paddingTop: 30,
-              textAlign: "justify",
+              fontSize: 22,
+              fontWeight: "bold",
+              marginTop: 10,
             }}
           >
-            {place.details}
+            {allBlogs.blogTitle}
           </Text>
-        </View>
-      </ImageBackground>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            }}
+          >
+            <View
+              style={{ width: "100%", flexDirection: "row", marginTop: 10 }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginRight: 10,
+                  alignItems: "center",
+                }}
+              >
+                <Icon name="category" size={16} color={COLORS.white} />
+                <Text style={{ color: COLORS.white, marginLeft: 5 }}>
+                  {allBlogs.blogCategory}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="timer" size={16} color={COLORS.white} />
+                <Text style={{ color: COLORS.white, marginLeft: 5 }}>
+                  1 hour ago
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontSize: 13,
+                paddingTop: 30,
+                textAlign: "justify",
+              }}
+            >
+              {allBlogs.blogContent}
+            </Text>
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
     );
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <StatusBar translucent={false} backgroundColor={COLORS.primary} />
-      <View style={style.header}>
-        {/* <Icon name="sort" size={28} color={COLORS.white} /> */}
-        <ImageBackground
-          source={{
-            uri: "https://www.graphicsprings.com/filestorage/stencils/2f3bdb9733c4a68659dc2900a7595fea.png?width=500&height=500",
-          }}
-          style={{
-            width: 50,
-            height: 50,
-            objectFit: "cover",
-          }}
-        />
-        <Icon name="notifications-none" size={28} color={COLORS.white} />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            backgroundColor: COLORS.primary,
-            height: 120,
-            paddingHorizontal: 20,
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text
-              style={
-                style.headerTitle && {
-                  letterSpacing: 1,
-                  color: COLORS.white,
-                  fontSize: 24,
+    <>
+      <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+        <StatusBar translucent={false} backgroundColor={COLORS.primary} />
+        <View style={style.header}>
+          {/* <Icon name="sort" size={28} color={COLORS.white} /> */}
+          <ImageBackground
+            source={{
+              uri: "https://www.graphicsprings.com/filestorage/stencils/2f3bdb9733c4a68659dc2900a7595fea.png?width=500&height=500",
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+            }}
+          />
+          <Image
+            source={{
+              uri: user.picture,
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 50,
+            }}
+          />
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              backgroundColor: COLORS.primary,
+              height: 120,
+              paddingHorizontal: 20,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text
+                style={
+                  style.headerTitle && {
+                    letterSpacing: 1,
+                    color: COLORS.white,
+                    fontSize: 24,
+                  }
                 }
-              }
-            >
-              Explore, New Blogs
-            </Text>
-            <Text
-              style={
-                style.headerTitle && {
-                  color: COLORS.white,
-                  fontSize: 16,
-                  color: COLORS.grey,
+              >
+                Explore, New Blogs
+              </Text>
+              <Text
+                style={
+                  style.headerTitle && {
+                    color: COLORS.white,
+                    fontSize: 16,
+                    color: COLORS.grey,
+                  }
                 }
-              }
-            >
-              with Digital Library
-            </Text>
-            <View style={style.inputContainer}>
-              <Icon name="search" size={24} />
-              <TextInput
-                placeholder="Search Blogs"
-                style={{ color: COLORS.grey, marginLeft: 10 }}
-              />
+              >
+                with Digital Library
+              </Text>
+              <View style={style.inputContainer}>
+                <Icon name="search" size={24} />
+                <TextInput
+                  placeholder="Search Blogs"
+                  style={{ color: COLORS.grey, marginLeft: 10 }}
+                />
+              </View>
             </View>
           </View>
-        </View>
-        <ListCategories />
-        <Text style={style.sectionTitle}>Featured Blogs</Text>
-        <View>
-          <FlatList
-            contentContainerStyle={{ paddingLeft: 20 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={places}
-            renderItem={({ item }) => <Card place={item} />}
-          />
-          <Text style={style.sectionTitle}>Recently Added Blogs</Text>
-          <FlatList
-            snapToInterval={width - 20}
-            contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            data={places}
-            renderItem={({ item }) => <RecommendedCard place={item} />}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <ListCategories />
+          <Text style={style.sectionTitle}>Featured Blogs</Text>
+          <View>
+            <FlatList
+              contentContainerStyle={{ paddingLeft: 20 }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={allBlogs}
+              renderItem={({ item }) => <Card allBlogs={item} />}
+            />
+            <Text style={style.sectionTitle}>Recently Added Blogs</Text>
+            <FlatList
+              snapToInterval={width - 20}
+              contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              data={allBlogs}
+              renderItem={({ item }) => <RecommendedCard allBlogs={item} />}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={COLORS.primary}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        />
+      ) : null}
+    </>
   );
 };
 

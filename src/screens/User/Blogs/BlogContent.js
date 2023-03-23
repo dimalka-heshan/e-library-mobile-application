@@ -62,11 +62,16 @@ const PopularCategories = [
 ];
 
 const BlogContent = ({ navigation, route }) => {
-  const place = route.params;
+  const allBlogs = route.params;
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
-      <ImageBackground style={{ flex: 0.7 }} source={place.image}>
+      <ImageBackground
+        style={{ flex: 0.7 }}
+        source={{
+          uri: allBlogs.blogImage,
+        }}
+      >
         <View style={style.header}>
           <Icon
             name="arrow-back-ios"
@@ -74,7 +79,6 @@ const BlogContent = ({ navigation, route }) => {
             color={COLORS.white}
             onPress={navigation.goBack}
           />
-          {/* <Icon name="more-vert" size={28} color={COLORS.white} /> */}
         </View>
         <View style={style.imageDetails}>
           <Text
@@ -86,13 +90,13 @@ const BlogContent = ({ navigation, route }) => {
               marginBottom: 20,
             }}
           >
-            {place.name}
+            {allBlogs.blogTitle}
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Image
               style={{ height: 25, width: 25, borderRadius: 25 }}
               source={{
-                uri: "https://static.toiimg.com/photo/67538607.cms",
+                uri: allBlogs.blogAuthor.picture,
               }}
             />
             <Text
@@ -102,12 +106,12 @@ const BlogContent = ({ navigation, route }) => {
                 fontSize: 16,
               }}
             >
-              Hasith Deminda
+              {allBlogs.blogAuthor.fullName}
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Icon name="timer" size={16} color={COLORS.white} />
               <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                1 hour ago
+                {allBlogs.publishedOn}
               </Text>
             </View>
           </View>
@@ -125,25 +129,6 @@ const BlogContent = ({ navigation, route }) => {
             paddingBottom: 100,
           }}
         >
-          {/* <View style={style.iconContainer}>
-            <Icon name="favorite" color={COLORS.red} size={30} />
-          </View> */}
-          {/* <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <Icon name="place" size={28} color={COLORS.primary} />
-            <Text
-              style={{
-                marginLeft: 5,
-                fontSize: 20,
-                fontWeight: "bold",
-                color: COLORS.primary,
-              }}
-            >
-              {place.location}
-            </Text>
-          </View>
-          <Text style={{ marginTop: 20, fontWeight: "bold", fontSize: 20 }}>
-            About the trip
-          </Text> */}
           <Text
             style={{
               marginTop: 20,
@@ -151,133 +136,89 @@ const BlogContent = ({ navigation, route }) => {
               textAlign: "justify",
             }}
           >
-            {place.details}
+            {allBlogs.blogContent}
           </Text>
 
           {/* Link references: */}
-          <View
-            style={{
-              marginTop: 20,
-              lineHeight: 22,
-              textAlign: "justify",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>References:</Text>
-            <View>
-              <Text style={{ color: "blue" }}>
-                https://www.youtube.com/watch?v=0S5a0e7jwlU
-              </Text>
-            </View>
-          </View>
-
-          {/* <View>
-            <VideoPlayer
-              videoProps={{
-                shouldPlay: false,
-                source: {
-                  uri: "https://www.youtube.com/watch?v=0S5a0e7jwlU",
-                },
-              }}
+          {allBlogs.blogReferences && (
+            <View
               style={{
-                width: "100%",
-                height: 300,
-                borderRadius: 10,
-                marginTop: 10,
+                marginTop: 20,
+                lineHeight: 22,
+                textAlign: "justify",
+                flexDirection: "column",
+                gap: 10,
               }}
-            />
-          </View> */}
+            >
+              <Text style={{ fontWeight: "bold" }}>References:</Text>
+              <View>
+                <Text style={{ color: "blue" }}>{allBlogs.blogReferences}</Text>
+              </View>
+            </View>
+          )}
 
-          <>
-            <Text
-              style={
-                style.sectionTitle && {
-                  top: 20,
-                  fontSize: 14,
-                  fontWeight: "bold",
+          {allBlogs.similarBooks && (
+            <View>
+              <Text
+                style={
+                  style.sectionTitle && {
+                    top: 20,
+                    fontSize: 14,
+                    fontWeight: "bold",
+                  }
                 }
-              }
-            >
-              Similar Books
-            </Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              <View style={style.categoryContainer}>
-                {PopularCategories.map((category, index) => (
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Image
-                      style={
-                        style.iconContainer && {
-                          width: 100,
-                          height: 150,
-                          borderRadius: 10,
-                          objectFit: "cover",
-                        }
-                      }
-                      source={{
-                        uri: category.catImg,
-                      }}
-                    />
-
-                    <Text
+              >
+                Similar Books
+              </Text>
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                <View style={style.categoryContainer}>
+                  {allBlogs.similarBooks.map((category, index) => (
+                    <View
+                      key={index}
                       style={{
-                        color: COLORS.dark,
-                        fontSize: 10,
-                        fontWeight: "bold",
-                        marginTop: 5,
-                        textAlign: "center",
-                        letterSpacing: 1,
-                        width: 100,
-                        flexWrap: "wrap",
+                        display: "flex",
+                        flexDirection: "column",
                       }}
                     >
-                      {truncate(category.name, 40)}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          </>
+                      <Image
+                        style={
+                          style.iconContainer && {
+                            width: 100,
+                            height: 150,
+                            borderRadius: 10,
+                            objectFit: "cover",
+                          }
+                        }
+                        source={{
+                          uri: category.bookBanner,
+                        }}
+                      />
+
+                      <Text
+                        style={{
+                          color: COLORS.dark,
+                          fontSize: 10,
+                          fontWeight: "bold",
+                          marginTop: 5,
+                          textAlign: "center",
+                          letterSpacing: 1,
+                          width: 100,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {truncate(category.bookName, 40)}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          )}
         </View>
       </ScrollView>
-      {/* <View style={style.footer}>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: COLORS.white,
-            }}
-          >
-            $100
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: COLORS.grey,
-              marginLeft: 2,
-            }}
-          >
-            /PER DAY
-          </Text>
-        </View>
-        <View style={style.bookNowBtn}>
-          <Text
-            style={{ color: COLORS.primary, fontSize: 16, fontWeight: "bold" }}
-          >
-            Book Now
-          </Text>
-        </View>
-      </View> */}
     </SafeAreaView>
   );
 };
