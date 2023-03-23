@@ -18,6 +18,7 @@ import {
 import COLORS from "../../../constants/color";
 import TempBooks from "../../../constants/book";
 import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
+import truncate from "truncate";
 
 const AllBookScreen = ({ navigation }) => {
   return (
@@ -45,11 +46,31 @@ const AllBookScreen = ({ navigation }) => {
           paddingRight: "2.5%",
         }}
       >
-        <View style={{ flexDirection: "row", padding: "3%" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            padding: "3%",
+            alignItems: "center",
+            justifyContent: "space-around",
+          }}
+        >
           <View style={styles.searchContainer}>
             <Icon name="search" size={25} style={{ marginLeft: 20 }} />
             <TextInput placeholder="Search" style={styles.input} />
           </View>
+
+          <TouchableOpacity
+            style={styles.addIcon}
+            onPress={() => navigation.push("AddBookScreen")}
+          >
+            <Icon
+              name="add"
+              size={28}
+              style={{
+                color: COLORS.white,
+              }}
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -68,21 +89,31 @@ const AllBookScreen = ({ navigation }) => {
               <Image source={book.img} style={styles.bookImage} />
               <View
                 style={{
-                  width: "50%",
-                  height: "100%",
+                  width: "100%",
+                  marginTop: "10%",
                   justifyContent: "center",
-                  marginLeft: "5%",
+                  alignItems: "center",
+                  padding: "5%",
+                  minHeight: 75,
                 }}
               >
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {book.name}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    letterSpacing: 1,
+                    textAlign: "center",
+                    lineHeight: 20,
+                  }}
+                >
+                  {truncate(book.name, 20)}
                 </Text>
                 <Text
                   style={{
-                    fontSize: 15,
+                    fontSize: 11,
                     fontWeight: "bold",
                     color: "gray",
-                    marginTop: 1,
+                    marginTop: 5,
                   }}
                 >
                   {book.price}
@@ -91,25 +122,50 @@ const AllBookScreen = ({ navigation }) => {
               <View
                 style={{
                   display: "flex",
-                  width: "25%",
+                  width: "100%",
                   flexDirection: "row",
                   alignContent: "center",
-                  alignSelf: "center",
-                  marginLeft: "5%",
+                  justifyContent: "space-evenly",
                 }}
               >
                 <TouchableOpacity
                   onPress={() => {
                     navigation.push("UpdateBookScreen");
                   }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 10,
+                    backgroundColor: COLORS.grey,
+                    position: "relative",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
-                  <Icon name="edit" size={28} color={COLORS.blue} />
+                  <Icon
+                    name="edit"
+                    size={18}
+                    color={COLORS.primary}
+                    style={{
+                      position: "absolute",
+                    }}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 10,
+                    backgroundColor: COLORS.grey,
+                    position: "relative",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <Icon
                     name="delete"
-                    size={28}
+                    size={20}
                     color="red"
                     style={{
                       marginLeft: "5%",
@@ -119,9 +175,6 @@ const AllBookScreen = ({ navigation }) => {
               </View>
             </View>
           ))}
-          <TouchableOpacity onPress={() => navigation.push("AddBookScreen")}>
-            <Icon name="add" size={30} style={{ marginLeft: "80%" }} />
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -135,7 +188,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     padding: "5%",
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingBottom: 200,
+    justifyContent: "space-evenly",
+    gap: 10,
   },
 
   header: {
@@ -153,33 +210,41 @@ const styles = StyleSheet.create({
   },
 
   bookContainer: {
-    width: "100%",
-    height: responsiveHeight(11),
+    width: responsiveWidth(40),
+    height: responsiveHeight(36),
     backgroundColor: COLORS.white,
     marginBottom: "5%",
     borderRadius: 10,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
+    flexDirection: "column",
   },
 
   bookImage: {
-    width: "15%",
-    height: "80%",
+    width: "80%",
+    height: "50%",
+    top: "5%",
     resizeMode: "contain",
     borderRadius: 15,
     alignContent: "center",
     alignSelf: "center",
-    marginLeft: "5%",
+    padding: 20,
   },
 
   searchContainer: {
-    height: responsiveHeight(6),
+    height: 50,
     backgroundColor: COLORS.white,
     borderRadius: 10,
-    flex: 1,
+    width: "80%",
     flexDirection: "row",
     alignItems: "center",
+  },
+
+  addIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   input: {

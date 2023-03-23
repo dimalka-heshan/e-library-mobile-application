@@ -231,7 +231,7 @@ export default function AdminTabs() {
         // Extra Tab Screen For Action Button..
       }
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name={"ActionButton"}
         component={AdvertisementStackScreen}
         options={{
@@ -260,7 +260,7 @@ export default function AdminTabs() {
             </TouchableOpacity>
           ),
         }}
-      ></Tab.Screen>
+      ></Tab.Screen> */}
 
       <Tab.Screen
         name={"BlogsStack"}
