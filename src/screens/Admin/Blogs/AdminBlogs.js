@@ -12,18 +12,15 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
 const { width } = Dimensions.get("screen");
-const AdminBlogs = ({ navigation }) => {
-  const categoryIcons = [
-    <Icon name="flight" size={25} color={COLORS.primary} />,
-    <Icon name="beach-access" size={25} color={COLORS.primary} />,
-    <Icon name="near-me" size={25} color={COLORS.primary} />,
-    <Icon name="place" size={25} color={COLORS.primary} />,
-  ];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
+const AdminBlogs = ({ navigation }) => {
   const PopularCategories = [
     {
       id: 1,
@@ -69,95 +66,55 @@ const AdminBlogs = ({ navigation }) => {
     },
   ];
 
-  const dummyBlogs = [
-    {
-      id: 1,
-      blogTitle: "The Best Places to Visit in Sri Lanka",
-      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
-      blogCategory: "Nature",
-      blogAuthor: "John Doe",
-      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
-      publishedOn: "2021-07-01",
-      blogReference: "https://www.google.com",
-      similarBooks: [
-        {
-          id: 1,
-          bookName: "Sri Lanka Travel Guide",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
-        },
-        {
-          id: 2,
-          bookName: "Lonely Planet Sri Lanka",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
-        },
-      ],
+  const [token, setToken] = React.useState("");
+  //Get token from local storage
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
 
-      blogContent:
-        "Sri Lanka is a small island country in the Indian Ocean, off the southern coast of India. It’s known for its beaches, diverse wildlife, ancient Buddhist ruins and tea plantations. Inland are mountains, rainforest and tea plantations, with Sigiriya, an ancient rock fortress, and the city of Kandy, Sri Lanka’s hill capital. The city of Galle is known for its fortified, Dutch-colonial buildings, and the city of Colombo has a busy shopping and nightlife scene.",
-    },
-    {
-      id: 2,
-      blogTitle: "The Best Places | China ",
-      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
-      blogCategory: "Econimics",
-      blogAuthor: "John Doe",
-      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
-      publishedOn: "2021-07-01",
-      blogReference: "https://www.google.com",
-      similarBooks: [
-        {
-          id: 1,
-          bookName: "Sri Lanka Travel Guide",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
+  //Get logged in user details
+  const [user, setUser] = React.useState([]);
+  // }, [user]);
+  const getUserDetails = () => {
+    setLoading(true);
+    axios
+      .get("/user/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          id: 2,
-          bookName: "Lonely Planet Sri Lanka",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
-        },
-      ],
-      blogContent:
-        "China is the world’s most populous country, with a population of 1.4 billion. It’s also the world’s second-largest country by land area, with a territory that spans 9.6 million square kilometers (3.7 million square miles). China is a vast country with a long history and a rich culture. It’s also a country with a lot of diversity, from the deserts of the west to the mountains of the east, and from the subtropical islands of the south to the frozen tundra of the north.",
-    },
-    {
-      id: 3,
-      blogTitle: "The Best Places | India",
-      blogImage: "https://i.imgur.com/6kKmU7q.jpg",
-      blogCategory: "Econimics",
-      blogAuthor: "John Doe",
-      blogAuthorImage: "https://i.imgur.com/6kKmU7q.jpg",
-      publishedOn: "2021-07-01",
-      blogReference: "https://www.google.com",
-      similarBooks: [
-        {
-          id: 1,
-          bookName: "Sri Lanka Travel Guide",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
-        },
-        {
-          id: 2,
-          bookName: "Lonely Planet Sri Lanka",
-          bookBanner: "https://i.imgur.com/6kKmU7q.jpg",
-        },
-      ],
-      blogContent:
-        "India is a vast South Asian country with diverse terrain – from Himalayan peaks to Indian Ocean coastline – and history reaching back 5 millennia. In the north, Mughal Empire landmarks include Delhi’s Red Fort complex and massive Jama Masjid mosque, plus Agra’s iconic Taj Mahal mausoleum. Pilgrims bathe in the Ganges in Varanasi, and Rishikesh is a yoga center and base for Himalayan trekking. The country’s also famed for its vibrant cuisine, and its many religions and languages.",
-    },
-  ];
+      })
+      .then((res) => {
+        setUser(res.data.user);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        setLoading(false);
+      });
+  };
 
   //Fetch all blogs from the database
   const [allBlogs, setAllBlogs] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
 
-  const getAllBlogs = async () => {
-    try {
-      const response = await axios("http://localhost:5000/blog/getAllBlogs");
-      setAllBlogs(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
+  const getAllBlogs = () => {
+    setLoading(true);
+    axios
+      .get("/blog/getAllBlogs")
+      .then((res) => {
+        setAllBlogs(res.data.blogs);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        setLoading(false);
+      });
   };
+
+  useEffect(() => {
+    getUserDetails();
+    getAllBlogs();
+  }, []);
 
   const ListCategories = () => {
     return (
@@ -179,6 +136,7 @@ const AdminBlogs = ({ navigation }) => {
           <View style={style.categoryContainer}>
             {PopularCategories.map((category, index) => (
               <View
+                key={index}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -218,16 +176,16 @@ const AdminBlogs = ({ navigation }) => {
     );
   };
 
-  const Card = ({ dummyBlogs }) => {
+  const Card = ({ allBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("AdminBlogContent", dummyBlogs)}
+        onPress={() => navigation.navigate("AdminBlogContent", allBlogs)}
       >
         <ImageBackground
           style={style.cardImage}
           source={{
-            uri: dummyBlogs.blogImage,
+            uri: allBlogs.blogImage,
           }}
         >
           <Text
@@ -238,13 +196,11 @@ const AdminBlogs = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {dummyBlogs.blogTitle}
+            {allBlogs.blogTitle}
           </Text>
           <View style={{ flexDirection: "row" }}>
             {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>
-              {dummyBlogs.publishedOn}
-            </Text>
+            <Text style={{ color: COLORS.white }}>{allBlogs.publishedOn}</Text>
           </View>
           <View
             style={{
@@ -257,191 +213,209 @@ const AdminBlogs = ({ navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Icon name="category" size={20} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
-                {dummyBlogs.blogCategory}
+                {allBlogs.blogCategory}
               </Text>
             </View>
-            {/* <View style={{ flexDirection: "row" }}>
-              <Icon name="calendar" size={20} color={COLORS.white} />
-              <Text style={{ marginLeft: 5, color: COLORS.white }}>5.0</Text>
-            </View> */}
           </View>
         </ImageBackground>
       </TouchableOpacity>
     );
   };
 
-  const RecommendedCard = ({ dummyBlogs }) => {
+  const RecommendedCard = ({ allBlogs }) => {
     return (
-      <ImageBackground
-        style={style.rmCardImage}
-        source={{
-          uri: dummyBlogs.blogImage,
-        }}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("AdminBlogContent", allBlogs)}
       >
-        <Text
-          style={{
-            color: COLORS.white,
-            fontSize: 22,
-            fontWeight: "bold",
-            marginTop: 10,
+        <ImageBackground
+          style={style.rmCardImage}
+          source={{
+            uri: allBlogs.blogImage,
           }}
         >
-          {dummyBlogs.blogTitle}
-        </Text>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-          }}
-        >
-          <View style={{ width: "100%", flexDirection: "row", marginTop: 10 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                marginRight: 10,
-                alignItems: "center",
-              }}
-            >
-              <Icon name="category" size={16} color={COLORS.white} />
-              <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {dummyBlogs.blogCategory}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Icon name="timer" size={16} color={COLORS.white} />
-              <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                1 hour ago
-              </Text>
-            </View>
-          </View>
           <Text
             style={{
               color: COLORS.white,
-              fontSize: 13,
-              paddingTop: 30,
-              textAlign: "justify",
+              fontSize: 22,
+              fontWeight: "bold",
+              marginTop: 10,
             }}
           >
-            {dummyBlogs.blogContent}
+            {allBlogs.blogTitle}
           </Text>
-        </View>
-      </ImageBackground>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            }}
+          >
+            <View
+              style={{ width: "100%", flexDirection: "row", marginTop: 10 }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginRight: 10,
+                  alignItems: "center",
+                }}
+              >
+                <Icon name="category" size={16} color={COLORS.white} />
+                <Text style={{ color: COLORS.white, marginLeft: 5 }}>
+                  {allBlogs.blogCategory}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="timer" size={16} color={COLORS.white} />
+                <Text style={{ color: COLORS.white, marginLeft: 5 }}>
+                  1 hour ago
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontSize: 13,
+                paddingTop: 30,
+                textAlign: "justify",
+              }}
+            >
+              {allBlogs.blogContent}
+            </Text>
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
     );
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <StatusBar translucent={false} backgroundColor={COLORS.primary} />
-      <View style={style.header}>
-        {/* <Icon name="sort" size={28} color={COLORS.white} /> */}
-        <ImageBackground
-          source={{
-            uri: "https://www.graphicsprings.com/filestorage/stencils/2f3bdb9733c4a68659dc2900a7595fea.png?width=500&height=500",
-          }}
-          style={{
-            width: 50,
-            height: 50,
-            objectFit: "cover",
-          }}
-        />
-        <Image
-          source={{
-            uri: "https://cdn.shopify.com/s/files/1/1045/8368/files/Young-blonde-lady-smiling-wearing-round-tortoise-shell-acetate-eyeglasses-frame.jpg?v=1654863352",
-          }}
-          style={{
-            width: 50,
-            height: 50,
-            objectFit: "cover",
-            borderRadius: 50,
-          }}
-        />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            backgroundColor: COLORS.primary,
-            height: 120,
-            paddingHorizontal: 20,
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text
-              style={
-                style.headerTitle && {
-                  letterSpacing: 1,
-                  color: COLORS.white,
-                  fontSize: 24,
-                }
-              }
-            >
-              Blogs & Articles
-            </Text>
-            <Text
-              style={
-                style.headerTitle && {
-                  color: COLORS.white,
-                  fontSize: 16,
-                  color: COLORS.grey,
-                }
-              }
-            >
-              Admin Panel
-            </Text>
-            <View style={style.inputContainer}>
-              <Icon name="search" size={24} />
-              <TextInput
-                placeholder="Search Blogs"
-                style={{ color: COLORS.grey, marginLeft: 10 }}
-              />
-            </View>
-          </View>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 30,
-          }}
-        >
-          <Text style={style.sectionTitle}>Featured Blogs</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("AddBlog")}
+    <>
+      <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+        <StatusBar translucent={false} backgroundColor={COLORS.primary} />
+        <View style={style.header}>
+          {/* <Icon name="sort" size={28} color={COLORS.white} /> */}
+          <ImageBackground
+            source={{
+              uri: "https://www.graphicsprings.com/filestorage/stencils/2f3bdb9733c4a68659dc2900a7595fea.png?width=500&height=500",
+            }}
             style={{
-              alignItems: "center",
-              justifyContent: "center",
-              marginRight: 20,
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+            }}
+          />
+          <Image
+            source={{
+              uri: user.picture,
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 50,
+            }}
+          />
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={{
               backgroundColor: COLORS.primary,
-              padding: 5,
-              borderRadius: 10,
-              marginRight: 20,
+              height: 120,
+              paddingHorizontal: 20,
             }}
           >
-            <Icon name="add" size={20} color={COLORS.white} />
-          </TouchableOpacity>
-        </View>
-        <View>
-          <FlatList
-            contentContainerStyle={{ paddingLeft: 20 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={dummyBlogs}
-            renderItem={({ item }) => <Card dummyBlogs={item} />}
-          />
-          <Text style={style.sectionTitle}>Recently Added Blogs</Text>
-          <FlatList
-            snapToInterval={width - 20}
-            contentContainerStyle={{ paddingLeft: 20 }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            data={dummyBlogs}
-            renderItem={({ item }) => <RecommendedCard dummyBlogs={item} />}
-          />
-          <ListCategories />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={
+                  style.headerTitle && {
+                    letterSpacing: 1,
+                    color: COLORS.white,
+                    fontSize: 24,
+                  }
+                }
+              >
+                Blogs & Articles
+              </Text>
+              <Text
+                style={
+                  style.headerTitle && {
+                    color: COLORS.white,
+                    fontSize: 16,
+                    color: COLORS.grey,
+                  }
+                }
+              >
+                Admin Panel
+              </Text>
+              <View style={style.inputContainer}>
+                <Icon name="search" size={24} />
+                <TextInput
+                  placeholder="Search Blogs"
+                  style={{ color: COLORS.grey, marginLeft: 10 }}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: 30,
+            }}
+          >
+            <Text style={style.sectionTitle}>Featured Blogs</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AddBlog")}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 20,
+                backgroundColor: COLORS.primary,
+                padding: 5,
+                borderRadius: 10,
+                marginRight: 20,
+              }}
+            >
+              <Icon name="add" size={20} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+          <View>
+            <FlatList
+              contentContainerStyle={{ paddingLeft: 20 }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={allBlogs}
+              renderItem={({ item }) => <Card allBlogs={item} />}
+            />
+            <Text style={style.sectionTitle}>Recently Added Blogs</Text>
+            <FlatList
+              snapToInterval={width - 20}
+              contentContainerStyle={{ paddingLeft: 20 }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              data={allBlogs}
+              renderItem={({ item }) => <RecommendedCard allBlogs={item} />}
+            />
+            <ListCategories />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={COLORS.primary}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        />
+      ) : null}
+    </>
   );
 };
 

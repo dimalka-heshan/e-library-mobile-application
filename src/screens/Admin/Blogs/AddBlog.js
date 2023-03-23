@@ -10,101 +10,190 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
-// import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { MultiSelect } from "react-native-element-dropdown";
+import axios from "axios";
 
 const AddBlog = ({ navigation }) => {
+  const body = new FormData();
   const route = useRoute();
   const navigate = useNavigation();
 
-  //Async store token
-  const [Token, setToken] = useState("");
+  const [token, setToken] = React.useState("");
+  //Get token from local storage
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
 
-  //   useEffect(() => {
-  //     AsyncStorage.getItem("token").then((token) => {
-  //       setToken(token);
-  //     });
-  //   }, []);
-
-  //   console.log(Token);
+  //For Multiple selection
+  const renderItem = (item) => {
+    return (
+      <View style={style.item}>
+        <Text>{item.bookName}</Text>
+      </View>
+    );
+  };
 
   //UseStates
+  const [loading, setLoading] = React.useState(false);
   const [blogTitle, setBlogTitle] = React.useState("");
   const [blogContent, setBlogContent] = React.useState("");
-  const [blogImage, setBlogImage] = React.useState("");
+  const [blogImage, setBlogImage] = React.useState({});
   const [blogCategory, setBlogCategory] = React.useState("");
   const [blogReference, setBlogReference] = React.useState("");
-  const [blogAuthor, setBlogAuthor] = React.useState("");
-  const [blogAuthorImage, setBlogAuthorImage] = React.useState("");
-  const [similarBooks, setSimilarBooks] = React.useState([
-    {
-      bookId: "",
-      bookTitle: "",
-      bookImage: "",
-    },
-  ]);
+  const [blogAuthor, setBlogAuthor] = React.useState({});
+  const [similarBooks, setSimilarBooks] = React.useState([]);
+  const [imageUploadStatus, setImageUploadStatus] = useState(
+    "Choose Blog Picture"
+  );
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState("");
 
-  const publishBlog = async () => {
-    if (
-      blogTitle === "" ||
-      blogContent === "" ||
-      blogImage === "" ||
-      blogCategory === ""
-    ) {
-      alert("Please fill all the fields");
-      return;
-    } else if (blogTitle.length < 5) {
-      alert("Blog Title should be atleast 5 characters long");
-      return;
-    } else if (blogTitle.length > 50) {
-      alert("Blog Title should be less than 50 characters long");
-      return;
-    } else if (blogContent.length < 100) {
-      alert("Blog Content should be atleast 100 characters long");
-      return;
-    } else if (blogContent.length > 10000) {
-      alert("Blog Content should be less than 10000 characters long");
-      return;
+  //for Image upload
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setBlogImage({
+        uri: result.assets[0].uri,
+        mimeType: `
+        ${result.assets[0].type}/jpg`,
+        imageName: "image.jpg",
+      });
+      setImageUploadStatus("Blog Image Uploaded");
     } else {
-      try {
-        const data = {
-          blogTitle: blogTitle,
-          blogContent: blogContent,
-          blogImage: blogImage,
-          blogCategory: blogCategory,
-          blogReference: blogReference,
-          blogAuthor: blogAuthor,
-          blogAuthorImage: blogAuthorImage,
-          similarBooks: similarBooks,
-        };
-        console.log(data);
-
-        axios
-          .post("http://localhost:5000/api/blogs/add", data, {
-            headers: {
-              Authorization: `Bearer ${Token}`,
-            },
-          })
-          .then((res) => {
-            console.log(res.data);
-            alert("Blog Published Successfully");
-            navigate.push("AdminBlogs");
-          })
-          .catch((err) => {
-            console.log(err);
-            alert("Error Publishing Blog");
-          });
-      } catch (err) {
-        console.log(err);
-      }
+      setBlogImage(null);
+      setImageUploadStatus("Choose Blog Image");
     }
   };
 
-  const [uploadStatus, setUploadStatus] = useState("Choose Blog Image");
+  //Get all books from database
+  const [books, setBooks] = React.useState([]);
+
+  const getAllBooks = () => {
+    setLoading(true);
+    axios
+      .get("/book/getAllBooks")
+      .then((res) => {
+        setBooks(res.data.filteredBooks);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        setLoading(false);
+      });
+  };
+
+  React.useEffect(() => {
+    getAllBooks();
+  }, []);
+
+  //Publish blog
+  const publishBlog = async () => {
+    body.append("blogTitle", blogTitle);
+    body.append("blogContent", blogContent);
+    body.append("blogImage", blogImage);
+    body.append("blogCategory", blogCategory);
+    body.append("blogReference", blogReference);
+    body.append("similarBooks", similarBooks);
+
+    console.log(JSON.stringify(body));
+    await axios
+      .post("/blog/createBlog", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setLoading(false);
+        Alert.alert("Success", "Blog Published Successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("AdminBlogs"),
+          },
+        ]);
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setLoading(false);
+            setError(err.response.data.message);
+          } else {
+            setLoading(false);
+            setValidationErrors(err.response.data.errors);
+          }
+        } else {
+          setLoading(false);
+          setError("Something went wrong!");
+        }
+      });
+
+    // if (blogTitle.length < 5) {
+    //   setError("Blog title should be at least 5 characters");
+    //   return;
+    // } else if (blogTitle.length > 25) {
+    //   setError("Blog title should be less than 25 characters");
+    //   return;
+    // } else {
+    //   setLoading(true);
+    //   body.append("blogTitle", blogTitle);
+    //   body.append("blogContent", blogContent);
+    //   body.append("blogImage", blogImage);
+    //   body.append("blogCategory", blogCategory);
+    //   body.append("blogReference", blogReference);
+    //   body.append("similarBooks", similarBooks);
+
+    //   console.log(JSON.stringify(body));
+    //   await axios
+    //     .post("/blog/createBlog", body, {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     })
+    //     .then((res) => {
+    //       console.log(res.data);
+    //       setLoading(false);
+    //       Alert.alert("Success", "Blog Published Successfully", [
+    //         {
+    //           text: "OK",
+    //           onPress: () => navigation.navigate("AdminBlogs"),
+    //         },
+    //       ]);
+    //     })
+    //     .catch((err) => {
+    //       console.log(JSON.stringify(err));
+    //       if (err.response.status == 400) {
+    //         if (err.response.data.message != "Data validation error!") {
+    //           setLoading(false);
+    //           setError(err.response.data.message);
+    //         } else {
+    //           setError("");
+    //           setLoading(false);
+    //           setValidationErrors(err.response.data.data);
+    //         }
+    //       } else {
+    //         setLoading(false);
+    //         setError("Something went wrong!");
+    //       }
+    //     });
+    // }
+  };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
@@ -165,7 +254,6 @@ const AddBlog = ({ navigation }) => {
                   fontSize: 24,
                   fontWeight: "bold",
                   color: COLORS.white,
-
                   letterSpacing: 1,
                 }}
               >
@@ -178,6 +266,13 @@ const AddBlog = ({ navigation }) => {
                 placeholder="Blog Title"
                 onChangeText={(text) => setBlogTitle(text)}
               />
+              {validationErrors.blogTitle ? (
+                <Text style={style.errorText}>
+                  {validationErrors.blogTitle}
+                </Text>
+              ) : (
+                ""
+              )}
               <TextInput
                 style={style.textInput}
                 placeholder="Category"
@@ -197,32 +292,88 @@ const AddBlog = ({ navigation }) => {
                 onChangeText={(text) => setBlogReference(text)}
                 placeholder="Add Reference Links (Optional)"
               />
-              {/* <Picker
-                selectedValue={blogCategory}
+              <MultiSelect
                 style={style.textInput}
-                onValueChange={(itemValue, itemIndex) =>
-                  setBlogCategory(itemValue)
-                }
-              >
-                <Picker.Item label="Select Category" value="" />
-                <Picker.Item label="Technology" value="Technology" />
-                <Picker.Item label="Education" value="Education" />
-                <Picker.Item label="Health" value="Health" />
-              </Picker> */}
+                placeholderStyle={{
+                  fontSize: 14,
+                  color: "grey",
+                }}
+                search
+                data={books}
+                labelField="bookName"
+                valueField="_id"
+                placeholder="Select Similar Books"
+                searchPlaceholder="Search Books"
+                value={selectedItems}
+                onChange={(item) => {
+                  setSelectedItems(item);
+                }}
+                renderItem={renderItem}
+                renderSelectedItem={(item, unSelect) => (
+                  <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        padding: 10,
+                        backgroundColor: "white",
+                        borderRadius: 5,
+                        gap: 10,
+                        marginBottom: "9%",
+                        marginLeft: "8%",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: COLORS.black,
+                        }}
+                      >
+                        {item.bookName}
+                      </Text>
+                      <Icon name="delete" size={20} color="red" />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
               <View style={style.imageUploadField}>
                 <TextInput
                   style={style.ImageTextInput}
                   placeholder="Choose File"
                   editable={false}
                   selectTextOnFocus={false}
-                  value={uploadStatus}
+                  value={imageUploadStatus}
                 />
 
-                <TouchableOpacity style={style.uploadButton}>
+                <TouchableOpacity
+                  style={style.uploadButton}
+                  onPress={pickImage}
+                >
                   <Text style={style.uploadTxt}>Upload</Text>
                 </TouchableOpacity>
               </View>
 
+              {error ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "red",
+                    borderRadius: 10,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+                  >
+                    {error}
+                  </Text>
+                </View>
+              ) : (
+                ""
+              )}
               <View style={style.buttonContainer}>
                 <TouchableOpacity
                   onPress={publishBlog}
@@ -258,7 +409,7 @@ const style = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: COLORS.primary,
     flex: 0.3,
-    paddingTop: 100,
+    paddingTop: 50,
   },
   header: {
     marginTop: 60,
@@ -300,7 +451,7 @@ const style = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     minHeight: 50,
-    marginBottom: 30,
+    marginBottom: 75,
   },
 
   loginButtonText: {
@@ -370,6 +521,21 @@ const style = StyleSheet.create({
   uploadTxt: {
     color: "white",
     fontWeight: "bold",
+  },
+  item: {
+    padding: 17,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  errorText: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-4%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
   },
 });
 
