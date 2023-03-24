@@ -41,6 +41,9 @@ export default function Profile({ navigation }) {
       .then((res) => {
         if (res.data) {
           setUser(res.data.user);
+          setTimeout(() => {
+            setLoading(false);
+          }, 1000);
         }
         setLoading(false);
       })
@@ -74,6 +77,7 @@ export default function Profile({ navigation }) {
             <Icon
               name="arrow-back"
               size={28}
+              color={COLORS.white}
               onPress={() => navigation.goBack()}
             />
           </View>

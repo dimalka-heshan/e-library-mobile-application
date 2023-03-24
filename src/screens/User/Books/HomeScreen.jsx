@@ -18,6 +18,7 @@ const width = Dimensions.get("window").width / 2 - 30;
 import COLORS from "../../../constants/color";
 import TempBooks from "../../../constants/book";
 import LottieView from "lottie-react-native";
+import truncate from "truncate";
 
 import {
   responsiveHeight,
@@ -180,7 +181,7 @@ export default function HomeScreen({ navigation }) {
               marginTop: 10,
             }}
           >
-            {book.bookName}
+            {truncate(book.bookName, 49)}
           </Text>
           <View
             style={{
