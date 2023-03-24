@@ -8,13 +8,14 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import React, { useRef, useState, useEffect } from "react";
 import COLORS from "../../../constants/color";
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from "react-native-responsive-dimensions";
+import axios from "axios";
 
 const book = {
   id: 1,
@@ -74,30 +75,67 @@ const book = {
 ];
 
 
+
 const BookFeedback = ({navigation}) => {
-    return (
-      <SafeAreaView
+  const [loading, setLoading] = React.useState(false);
+  const [createdAt, setCreatedAt] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [rating, setRating] = useState("");
+
+  // const getAllFeedbacks = async () => {
+  //   setLoading(true);
+  //   const { bookID } = route.params;
+
+  //   await axios
+  //     .get(`feedback/getFeedbacks/${bookID}`)
+  //     .then((res) => {
+  //       setLoading(false);
+  //       setFeedback(res.data.feedbacks.feedback);
+  //       setCreatedAt(res.data.feedbacks.createdAt);
+  //       setRating(res.data.feedbacks.rating);
+  //     })
+  //     .catch((err) => {
+  //       setLoading(false);
+  //       if (err.response.status == 400) {
+  //         if (err.response.data.message != "Data validation error!") {
+  //           setError(err.response.data.message);
+  //         } else {
+  //           setValidationErrors(err.response.data.data);
+  //         }
+  //       } else {
+  //         setError("Something went wrong!");
+  //       }
+  //     });
+  // };
+
+  //   useEffect(() => {
+  //      getAllFeedbacks()
+  //   }, []);
+
+  return (
+    <SafeAreaView
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: COLORS.light
+        backgroundColor: COLORS.light,
       }}
     >
       <View style={style.header}>
         <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
       </View>
-      
+
       <Text
-           style={{
-                  fontSize: 27,
-                  marginLeft: '3%',
-                  fontWeight: "bold",
-                  marginTop: "2%",
-                  width: "100%",
-                  color: COLORS.dark, fontWeight: "bold"
-                }}
-              >
-                User Feedbacks :  {book.name} 
+        style={{
+          fontSize: 27,
+          marginLeft: "3%",
+          fontWeight: "bold",
+          marginTop: "2%",
+          width: "100%",
+          color: COLORS.dark,
+          fontWeight: "bold",
+        }}
+      >
+        User Feedbacks : {book.name}
       </Text>
 
       <View style={style.buttonContainer}>
@@ -111,68 +149,60 @@ const BookFeedback = ({navigation}) => {
       </View>
 
       <View style={style.mypost}>
-      <TouchableOpacity
-            key={mycomment.id}
-            
-          > 
-            <View style={style.postContent}>
-              <Text style={style.postTitle}>{mycomment.name} | <Icon
-            justifyContent="flex-end"
-            name="star"
-            size={responsiveFontSize(4)}
-            color="#ffb300"
-          />     
-              {mycomment.rating}/5</Text>
-              <View
-                style={{
-                  width: "10%",
-                }}
-              >
-                <TouchableOpacity style={style.editButton}>
-                  <Icon name="edit" size={35} color={COLORS.blue} />
-                </TouchableOpacity>
-              </View> 
-              <TouchableOpacity style={style.deleteButton}>
-                  <Icon name="delete" size={35} color={COLORS.red} />
-                </TouchableOpacity>
-              
-              <Text style={style.postMeta}>
-                | {mycomment.date}
-              </Text>
-              <Text style={style.postExcerpt}>{mycomment.comment}</Text>
+        <TouchableOpacity key={mycomment.id}>
+          <View style={style.postContent}>
+            <Text style={style.postTitle}>
+              {mycomment.name} |{" "}
+              <Icon
+                justifyContent="flex-end"
+                name="star"
+                size={responsiveFontSize(4)}
+                color="#ffb300"
+              />
+              {mycomment.rating}/5
+            </Text>
+            <View
+              style={{
+                width: "10%",
+              }}
+            >
+              <TouchableOpacity style={style.editButton}>
+                <Icon name="edit" size={35} color={COLORS.blue} />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity> 
+            <TouchableOpacity style={style.deleteButton}>
+              <Icon name="delete" size={35} color={COLORS.red} />
+            </TouchableOpacity>
+
+            <Text style={style.postMeta}>| {mycomment.date}</Text>
+            <Text style={style.postExcerpt}>{mycomment.comment}</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView>
         {posts.map((post) => (
-          <TouchableOpacity
-            key={post.id}
-            style={style.post}
-          >
-            
+          <TouchableOpacity key={post.id} style={style.post}>
             <View style={style.postContent}>
-              <Text style={style.postTitle}>{post.name} | <Icon
-            justifyContent="flex-end"
-            name="star"
-            size={responsiveFontSize(4)}
-            color="#ffb300"
-          />     
-              {post.rating}/5</Text>
-              <Text style={style.postMeta}>
-                | {post.date}
+              <Text style={style.postTitle}>
+                {post.name} |{" "}
+                <Icon
+                  justifyContent="flex-end"
+                  name="star"
+                  size={responsiveFontSize(4)}
+                  color="#ffb300"
+                />
+                {post.rating}/5
               </Text>
+              <Text style={style.postMeta}>| {post.date}</Text>
               <Text style={style.postExcerpt}>{post.comment}</Text>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
-
-        
-  
     </SafeAreaView>
-    )
-  }
+  );
+}
 
 
   export default BookFeedback;
