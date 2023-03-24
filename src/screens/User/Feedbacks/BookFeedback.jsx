@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -113,10 +114,11 @@ const BookFeedback = ({navigation, route}) => {
     await axios
       .get(`/feedback/getFeedbacks/${book._id}`)
       .then((res) => {
-        // console.log(res.data.feedbacks);
+        // console.log(res.data.feedbacks._id);
 
         setLoading(false);
         setFeedbacks(res.data.feedbacks);
+       
       })
       .catch((err) => {
         setLoading(false);
@@ -132,12 +134,39 @@ const BookFeedback = ({navigation, route}) => {
       });
   };
 
+
+
+   //delete feedback
+   const deletefeedback = async (id) => {
+    setLoading(true);
+    await axios
+      .delete(`/feedback/deleteFeedback/${id}`, { 
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setLoading(false);
+        Alert.alert("Success", "Feedback deleted successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.push("BookFeedback",book),
+            
+          },
+        ]);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     getAllFeedbacks();
     getUserDetails();
   }, [token]);
 
-  // console.log(user.firstName);
+  // console.log(feedbacks);
 
   
   return (
@@ -209,7 +238,24 @@ const BookFeedback = ({navigation, route}) => {
                   marginLeft:"30%",
                   
                 }} >
-              <TouchableOpacity >
+              <TouchableOpacity 
+              onPress={() => {
+                Alert.alert(
+                  "Delete Book",
+                  "Are you sure you want to delete your feedback?",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => deletefeedback(post._id),
+                    },
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Cancel Pressed"),
+                    },
+                  ]
+                );
+              }}>
+              
                 <Icon name="delete" size={35} color={COLORS.red} />
               </TouchableOpacity>
               </View>
