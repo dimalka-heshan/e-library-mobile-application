@@ -84,7 +84,7 @@ const BookFeedback = ({navigation, route}) => {
   const [rating, setRating] = useState("");
 
   const book = route.params;
-
+console.log(book);
 
   const [token, setToken] = React.useState("");
   AsyncStorage.getItem("token").then((token) => {

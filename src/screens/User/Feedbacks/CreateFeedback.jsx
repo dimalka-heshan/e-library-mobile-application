@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity,Alert } from 'react-native'
 import React, { useState } from 'react';
 import COLORS from "../../../constants/color";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -9,61 +9,73 @@ import {
   } from "react-native-responsive-dimensions";
 import { TextInput } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+  
+
+const CreateFeedback = ({navigation, route}) => {
+    const [starRating, setStarRating] = useState(null);
+    const [feedback, setfeedback] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [token, setToken] = useState("");
+    const [error, setError] = useState("");
+    const [validationErrors, setValidationErrors] = useState({});
+
+    const book = route.params;
+
+    // console.log(book);
+    AsyncStorage.getItem("token").then((value) => {
+      setToken(value);
+    });
   
 
 
-const CreateFeedback = ({navigation}) => {
-  const body = new FormData();
-  const { bookID } = route.params;
-    const [starRating, setStarRating] = useState(null);
-    const [loading, setLoading] = React.useState(false);
-    const [error, setError] = useState("");
+  //Add feedback handler
+  const handleAddFeedback = async () => {
 
+    const data = {feedback,rating:starRating}
 
-  // const publishFeedback = async () => {
-  //   setLoading(true);
-  //   setError("");
-
-  //   const body = new FormData();
-  //   body.append("feedback", feedback);
-  //   body.append("rating", rating);
-
-  //   await axios
-  //     .post("feedback/createFeedback/${bookID}", body, {
-  //       headers: {
-  //         "Contest-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then((res) => {
-  //       setLoading(false);
-  //       Alert.alert("Success", "Feedback Published Successfully", [
-  //         {
-  //           text: "OK",
-  //           onPress: () => navigation.push("BookFeedback"),
-  //         },
-  //       ]);
-  //     })
-  //     .catch((err) => {
-  //       setLoading(false);
-  //       if (err.response.status == 400) {
-  //         if (err.response.data.message != "Data validation error!") {
-  //           setError(err.response.data.message);
-  //         } else {
-  //           setValidationErrors(err.response.data.data);
-  //         }
-  //       } else {
-  //         setError("Something went wrong!");
-  //       }
-  //     });
-  // };
-
+    try {
+      await axios
+        .post(`/feedback/createFeedback/${book}`,data ,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+            
+          },
+        })
+        .then((res) => {
+          
+          Alert.alert("Success", "Feedback Added Successfully!", [
+            {
+              text: "OK",
+              onPress: () => navigation.push("BookFeedback",book),
+            },
+          ]);
+        })
+        .catch((err) => {
+          
+          if (err.response.status == 400) {
+            if (err.response.data.message != "Data validation error!") {
+              setError(err.response.data.message);
+            } else {
+              
+            }
+          } else {
+            setError("Something went wrong!");
+          }
+        });
+    } catch (e) {
+      setLoading(false);
+      setError("Something went wrong!");
+    }
+  };
+  
 
   return (
     <SafeAreaView
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: COLORS.white,
+        // backgroundColor: COLORS.white,
       }}
     >
       <View style={styles.header}>
@@ -140,11 +152,20 @@ const CreateFeedback = ({navigation}) => {
 
       <View style={styles.textInputContainer}>
         <View style={styles.loginContainer}>
-          <TextInput style={styles.textInput} placeholder="Your Feedback" />
+        <TextInput
+                  style={styles.textArea}
+                  placeholder="Enter your Feedback"
+                  multiline={true}
+                  numberOfLines={20}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  onChangeText={(text) => setfeedback(text)}
+                />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={publishFeedback}
+              onPress={handleAddFeedback}
+              
             >
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
@@ -169,7 +190,7 @@ const styles = StyleSheet.create({
       container: {
         flex: 2,
         // height: 50,
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
@@ -197,7 +218,7 @@ const styles = StyleSheet.create({
         height: "50%",
         alignSelf: "center",
         marginTop: responsiveHeight(-5),
-        backgroundColor: "white"
+        // backgroundColor: "white"
       },
       loginContainer: {
         width: "100%",
@@ -208,7 +229,7 @@ const styles = StyleSheet.create({
         width: "102%",
         marginTop: responsiveHeight(1),
         height: 150,
-        backgroundColor: "#99FFFF",
+        // backgroundColor: "#99FFFF",
         borderRadius: 10,
         paddingLeft: 10,
         marginBottom: "15%",
@@ -231,5 +252,16 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 27
       },
+      textArea: {
+        width: "100%",
+        height: 200,
+        backgroundColor: "white",
+        padding: 10,
+        marginBottom: "5%",
+        textAlignVertical: "top",
+    
+        borderRadius: 10,
+      },
+    
     
 })
