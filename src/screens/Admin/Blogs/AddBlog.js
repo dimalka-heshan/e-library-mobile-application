@@ -90,7 +90,6 @@ const AddBlog = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -99,7 +98,6 @@ const AddBlog = ({ navigation }) => {
     getAllBooks();
   }, []);
 
-  console.log(validationErrors);
   //Publish blog
   const publishBlog = async () => {
     setError("");
@@ -132,7 +130,7 @@ const AddBlog = ({ navigation }) => {
         ]);
       })
       .catch((err) => {
-        console.log(JSON.stringify(err.response.data.data));
+        // console.log(JSON.stringify(err.response.data.data));
         if (err.response.status == 400) {
           if (err.response.data.message != "Data validation error!") {
             setError(err.response.data.message);

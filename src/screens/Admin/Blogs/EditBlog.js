@@ -56,7 +56,6 @@ const EditBlog = ({ navigation, route }) => {
   );
   const [selectedItems, setSelectedItems] = useState([]);
 
-  console.log(selectedItems);
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
 
@@ -102,7 +101,7 @@ const EditBlog = ({ navigation, route }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        // console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -112,7 +111,6 @@ const EditBlog = ({ navigation, route }) => {
     filterSimilarBooks();
   }, []);
 
-  console.log(validationErrors);
   //Publish blog
   const publishBlog = async () => {
     setError("");
@@ -145,7 +143,7 @@ const EditBlog = ({ navigation, route }) => {
         ]);
       })
       .catch((err) => {
-        console.log(JSON.stringify(err.response));
+        // console.log(JSON.stringify(err.response));
         if (err.response.status == 400) {
           if (err.response.data.message != "Data validation error!") {
             setError(err.response.data.message);

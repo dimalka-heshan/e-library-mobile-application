@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import moment from "moment";
 import React from "react";
 import {
   ImageBackground,
@@ -38,13 +39,13 @@ const AdminBlogContent = ({ navigation, route }) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         Alert.alert("Success", "Blog deleted successfully", [
           { text: "OK", onPress: () => navigation.push("AdminBlogs") },
         ]);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -105,7 +106,7 @@ const AdminBlogContent = ({ navigation, route }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Icon name="timer" size={16} color={COLORS.white} />
               <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {allBlogs.publishedOn}
+                {moment(allBlogs.publishedOn).fromNow()}
               </Text>
             </View>
           </View>
@@ -124,7 +125,7 @@ const AdminBlogContent = ({ navigation, route }) => {
                 onPress={() => navigation.push("EditBlog", allBlogs)}
                 style={{
                   backgroundColor: COLORS.grey,
-                  padding: 5,
+                  padding: 10,
                   borderRadius: 10,
                   marginRight: 10,
                 }}
@@ -151,7 +152,7 @@ const AdminBlogContent = ({ navigation, route }) => {
                 }
                 style={{
                   backgroundColor: COLORS.grey,
-                  padding: 5,
+                  padding: 10,
                   borderRadius: 10,
                   marginRight: 10,
                 }}

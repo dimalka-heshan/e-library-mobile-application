@@ -1,3 +1,4 @@
+import moment from "moment";
 import React from "react";
 import {
   ImageBackground,
@@ -8,6 +9,7 @@ import {
   Text,
   ScrollView,
   Image,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 // import { Video } from "expo-av";
@@ -69,7 +71,7 @@ const BlogContent = ({ navigation, route }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Icon name="timer" size={16} color={COLORS.white} />
               <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {allBlogs.publishedOn}
+                {moment(allBlogs.publishedOn).fromNow()}
               </Text>
             </View>
           </View>
@@ -92,6 +94,7 @@ const BlogContent = ({ navigation, route }) => {
               marginTop: 20,
               lineHeight: 22,
               textAlign: "justify",
+              marginBottom: 20,
             }}
           >
             {allBlogs.blogContent}
@@ -101,7 +104,6 @@ const BlogContent = ({ navigation, route }) => {
           {allBlogs.blogReference ? (
             <View
               style={{
-                marginTop: 20,
                 lineHeight: 22,
                 textAlign: "justify",
                 flexDirection: "column",
@@ -110,7 +112,14 @@ const BlogContent = ({ navigation, route }) => {
             >
               <Text style={{ fontWeight: "bold" }}>References:</Text>
               <View>
-                <Text style={{ color: "blue" }}>{allBlogs.blogReference}</Text>
+                <Text
+                  style={{ color: "blue" }}
+                  onPress={() => {
+                    Linking.openURL(allBlogs.blogReference);
+                  }}
+                >
+                  {allBlogs.blogReference}
+                </Text>
               </View>
             </View>
           ) : null}

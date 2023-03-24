@@ -19,8 +19,32 @@ import COLORS from "../../../constants/color";
 const { width } = Dimensions.get("screen");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import moment from "moment";
+import AnimatedLottieView from "lottie-react-native";
 
 const AdminBlogs = ({ navigation }) => {
+  //Fetch all blogs from the database
+  const [allBlogs, setAllBlogs] = React.useState([]);
+
+  //Search function for blogs
+  const filterData = (allBlogs, searchKey) => {
+    const result = allBlogs.filter((item) =>
+      item.blogTitle.toLowerCase().includes(searchKey)
+    );
+    setAllBlogs(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get("/blog/getAllBlogs")
+      .then((res) => {
+        filterData(res.data.blogs, e);
+      })
+      .catch((err) => {
+        // console.log(err);
+      });
+  };
+
   //Get total blogs
   const [totalBlogs, setTotalBlogs] = React.useState(0);
   const getTotalBlogs = () => {
@@ -28,10 +52,10 @@ const AdminBlogs = ({ navigation }) => {
       .get("/blog/getTotalBlogs")
       .then((res) => {
         setTotalBlogs(res.data.totalBlogs);
-        console.log("Total Blogs", res.data.totalBlogs);
+        // console.log("Total Blogs", res.data.totalBlogs);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -42,10 +66,10 @@ const AdminBlogs = ({ navigation }) => {
       .get("/blog/getTodaysBlogs")
       .then((res) => {
         setRecentBlogs(res.data.todaysBlogs);
-        console.log("Recent Blogs", res.data.todaysBlogs);
+        // console.log("Recent Blogs", res.data.todaysBlogs);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -60,10 +84,10 @@ const AdminBlogs = ({ navigation }) => {
       })
       .then((res) => {
         setTotalUsers(res.data.userCount);
-        console.log("Total Users", res.data.userCount);
+        // console.log("Total Users", res.data.userCount);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -78,10 +102,10 @@ const AdminBlogs = ({ navigation }) => {
       })
       .then((res) => {
         setTotalAdmins(res.data.adminCount);
-        console.log("Total Admins", res.data.adminCount);
+        // console.log("Total Admins", res.data.adminCount);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -110,8 +134,6 @@ const AdminBlogs = ({ navigation }) => {
       });
   };
 
-  //Fetch all blogs from the database
-  const [allBlogs, setAllBlogs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
   const getAllBlogs = () => {
@@ -273,9 +295,11 @@ const AdminBlogs = ({ navigation }) => {
           >
             {allBlogs.blogTitle}
           </Text>
-          <View style={{ flexDirection: "row" }}>
-            {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>{allBlogs.publishedOn}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Icon name="date-range" size={16} color={COLORS.white} />
+            <Text style={{ color: COLORS.white }}>
+              {moment(allBlogs.createdAt).format("DD MMM YYYY")}
+            </Text>
           </View>
           <View
             style={{
@@ -285,8 +309,8 @@ const AdminBlogs = ({ navigation }) => {
               alignItems: "flex-end",
             }}
           >
-            <View style={{ flexDirection: "row" }}>
-              <Icon name="category" size={20} color={COLORS.white} />
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Icon name="category" size={16} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
                 {allBlogs.blogCategory}
               </Text>
@@ -346,7 +370,7 @@ const AdminBlogs = ({ navigation }) => {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Icon name="timer" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  1 hour ago
+                  {moment(recentlyAddedBlogs.publishedOn).fromNow()}
                 </Text>
               </View>
             </View>
@@ -429,7 +453,8 @@ const AdminBlogs = ({ navigation }) => {
                 <Icon name="search" size={24} />
                 <TextInput
                   placeholder="Search Blogs"
-                  style={{ color: COLORS.grey, marginLeft: 10 }}
+                  onChangeText={(text) => onSearch(text.toLocaleLowerCase())}
+                  style={{ color: COLORS.black, marginLeft: 10 }}
                 />
               </View>
             </View>
@@ -460,24 +485,79 @@ const AdminBlogs = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View>
-            <FlatList
-              contentContainerStyle={{ paddingLeft: 20 }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={allBlogs}
-              renderItem={({ item }) => <Card allBlogs={item} />}
-            />
+            {allBlogs.length != 0 ? (
+              <FlatList
+                contentContainerStyle={{ paddingLeft: 20 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={allBlogs}
+                renderItem={({ item }) => <Card allBlogs={item} />}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
             <Text style={style.sectionTitle}>Recently Added Blogs</Text>
-            <FlatList
-              snapToInterval={width - 20}
-              contentContainerStyle={{ paddingLeft: 20 }}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              data={recentlyAddedBlogs}
-              renderItem={({ item }) => (
-                <RecommendedCard recentlyAddedBlogs={item} />
-              )}
-            />
+
+            {recentlyAddedBlogs.length != 0 ? (
+              <FlatList
+                snapToInterval={width - 20}
+                contentContainerStyle={{ paddingLeft: 20 }}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                data={recentlyAddedBlogs}
+                renderItem={({ item }) => (
+                  <RecommendedCard recentlyAddedBlogs={item} />
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
             <ListCategories />
           </View>
         </ScrollView>

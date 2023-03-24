@@ -16,10 +16,11 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
-import places from "../../../constants/places";
 const { width } = Dimensions.get("screen");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import moment from "moment";
+import AnimatedLottieView from "lottie-react-native";
 
 const BlogScreen = ({ navigation }) => {
   const PopularCategories = [
@@ -67,6 +68,28 @@ const BlogScreen = ({ navigation }) => {
     },
   ];
 
+  //Fetch all blogs from the database
+  const [allBlogs, setAllBlogs] = React.useState([]);
+
+  //Search function for blogs
+  const filterData = (allBlogs, searchKey) => {
+    const result = allBlogs.filter((item) =>
+      item.blogTitle.toLowerCase().includes(searchKey)
+    );
+    setAllBlogs(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get("/blog/getAllBlogs")
+      .then((res) => {
+        filterData(res.data.blogs, e);
+      })
+      .catch((err) => {
+        // console.log(err);
+      });
+  };
+
   const [token, setToken] = React.useState("");
   //Get token from local storage
   AsyncStorage.getItem("token").then((token) => {
@@ -88,13 +111,11 @@ const BlogScreen = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        // console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
 
-  //Fetch all blogs from the database
-  const [allBlogs, setAllBlogs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
   const getAllBlogs = () => {
@@ -106,7 +127,7 @@ const BlogScreen = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        // console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -214,9 +235,12 @@ const BlogScreen = ({ navigation }) => {
           >
             {allBlogs.blogTitle}
           </Text>
-          <View style={{ flexDirection: "row" }}>
-            {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>{allBlogs.publishedOn}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name="date-range" size={16} color={COLORS.white} />
+            <Text style={{ color: COLORS.white }}>
+              {" "}
+              {moment(allBlogs.createdAt).format("DD MMM YYYY")}
+            </Text>
           </View>
           <View
             style={{
@@ -227,7 +251,7 @@ const BlogScreen = ({ navigation }) => {
             }}
           >
             <View style={{ flexDirection: "row" }}>
-              <Icon name="category" size={20} color={COLORS.white} />
+              <Icon name="category" size={16} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
                 {allBlogs.blogCategory}
               </Text>
@@ -285,7 +309,7 @@ const BlogScreen = ({ navigation }) => {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Icon name="timer" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  1 hour ago
+                  {moment(recentlyAddedBlogs.publishedOn).fromNow()}
                 </Text>
               </View>
             </View>
@@ -369,7 +393,8 @@ const BlogScreen = ({ navigation }) => {
                 <Icon name="search" size={24} />
                 <TextInput
                   placeholder="Search Blogs"
-                  style={{ color: COLORS.grey, marginLeft: 10 }}
+                  onChangeText={(text) => onSearch(text.toLocaleLowerCase())}
+                  style={{ color: COLORS.black, marginLeft: 10 }}
                 />
               </View>
             </View>
@@ -377,24 +402,79 @@ const BlogScreen = ({ navigation }) => {
           <ListCategories />
           <Text style={style.sectionTitle}>Featured Blogs</Text>
           <View>
-            <FlatList
-              contentContainerStyle={{ paddingLeft: 20 }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={allBlogs}
-              renderItem={({ item }) => <Card allBlogs={item} />}
-            />
+            {allBlogs.length != 0 ? (
+              <FlatList
+                contentContainerStyle={{ paddingLeft: 20 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={allBlogs}
+                renderItem={({ item }) => <Card allBlogs={item} />}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
             <Text style={style.sectionTitle}>Recently Added Blogs</Text>
-            <FlatList
-              snapToInterval={width - 20}
-              contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              data={recentlyAddedBlogs}
-              renderItem={({ item }) => (
-                <RecommendedCard recentlyAddedBlogs={item} />
-              )}
-            />
+
+            {recentlyAddedBlogs.length != 0 ? (
+              <FlatList
+                snapToInterval={width - 20}
+                contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                data={recentlyAddedBlogs}
+                renderItem={({ item }) => (
+                  <RecommendedCard recentlyAddedBlogs={item} />
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
