@@ -13,13 +13,15 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
-import places from "../../../constants/places";
 const { width } = Dimensions.get("screen");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import moment from "moment";
+import AnimatedLottieView from "lottie-react-native";
 
 const BlogScreen = ({ navigation }) => {
   const PopularCategories = [
@@ -28,44 +30,73 @@ const BlogScreen = ({ navigation }) => {
       name: "History",
       catImg:
         "https://upload.wikimedia.org/wikipedia/commons/2/24/1686_Mallet_Map_of_Ceylon_or_Sri_Lanka_%28Taprobane%29_-_Geographicus_-_Taprobane-mallet-1686.jpg",
+      link: "https://feedly.com/i/top/history-blogs",
     },
     {
       id: 2,
       name: "Culture",
       catImg:
         "https://strategicpsychology.com.au/wp-content/uploads/Multicultural-character.jpg",
+      link: "https://blog.feedspot.com/culture_blogs/",
     },
     {
       id: 3,
       name: "Nature",
       catImg:
         "https://images.news18.com/ibnlive/uploads/2021/07/1627448017_world-nature-conservation-day.png",
+      link: "https://blog.feedspot.com/nature_blogs/",
     },
     {
       id: 4,
       name: "Adventure",
       catImg:
         "https://warnercnr.colostate.edu/wp-content/uploads/sites/2/2017/04/shutterstock_428626417-1024x683.jpg",
+      link: "https://adventureblog.net/blog",
     },
     {
       id: 5,
       name: "Religion",
       catImg:
         "https://www.jobs.ca/content/uploads/2018/03/religion-and-business.jpg",
+      link: "https://blog.feedspot.com/religion_blogs/",
     },
     {
       id: 6,
       name: "Food",
       catImg:
         "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
+      link: "https://blog.feedspot.com/food_blogs/",
     },
     {
       id: 7,
       name: "Wildlife",
       catImg:
         "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
+      link: "https://blog.feedspot.com/wildlife_blogs/",
     },
   ];
+
+  //Fetch all blogs from the database
+  const [allBlogs, setAllBlogs] = React.useState([]);
+
+  //Search function for blogs
+  const filterData = (allBlogs, searchKey) => {
+    const result = allBlogs.filter((item) =>
+      item.blogTitle.toLowerCase().includes(searchKey)
+    );
+    setAllBlogs(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get("/blog/getAllBlogs")
+      .then((res) => {
+        filterData(res.data.blogs, e);
+      })
+      .catch((err) => {
+        // console.log(err);
+      });
+  };
 
   const [token, setToken] = React.useState("");
   //Get token from local storage
@@ -88,13 +119,11 @@ const BlogScreen = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        // console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
 
-  //Fetch all blogs from the database
-  const [allBlogs, setAllBlogs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
   const getAllBlogs = () => {
@@ -106,7 +135,22 @@ const BlogScreen = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
+        // console.log(JSON.stringify(err));
+        setLoading(false);
+      });
+  };
+
+  //Get recently added blogs
+  const [recentlyAddedBlogs, setRecentlyAddedBlogs] = React.useState([]);
+  const getRecentlyAddedBlogs = () => {
+    setLoading(true);
+    axios
+      .get("/blog/getRecentBlogs")
+      .then((res) => {
+        setRecentlyAddedBlogs(res.data.blogs);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
         setLoading(false);
       });
   };
@@ -114,7 +158,8 @@ const BlogScreen = ({ navigation }) => {
   useEffect(() => {
     getUserDetails();
     getAllBlogs();
-  }, []);
+    getRecentlyAddedBlogs();
+  }, [token]);
 
   const ListCategories = () => {
     return (
@@ -136,12 +181,16 @@ const BlogScreen = ({ navigation }) => {
           <View style={style.categoryContainer}>
             {PopularCategories.map((category, index) => (
               <View
+                key={index}
                 style={{
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
                 <Image
+                  key={index}
+                  //Open the category link in the browser without leaving the app
+
                   style={
                     style.iconContainer && {
                       width: 50,
@@ -163,6 +212,9 @@ const BlogScreen = ({ navigation }) => {
                     marginTop: 5,
                     textAlign: "center",
                     letterSpacing: 1,
+                  }}
+                  onPress={() => {
+                    Linking.openURL(category.link);
                   }}
                 >
                   {category.name}
@@ -197,9 +249,12 @@ const BlogScreen = ({ navigation }) => {
           >
             {allBlogs.blogTitle}
           </Text>
-          <View style={{ flexDirection: "row" }}>
-            {/* <Icon name="star" size={20} color={COLORS.white} /> */}
-            <Text style={{ color: COLORS.white }}>{allBlogs.publishedOn}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name="date-range" size={16} color={COLORS.white} />
+            <Text style={{ color: COLORS.white }}>
+              {" "}
+              {moment(allBlogs.createdAt).format("DD MMM YYYY")}
+            </Text>
           </View>
           <View
             style={{
@@ -210,7 +265,7 @@ const BlogScreen = ({ navigation }) => {
             }}
           >
             <View style={{ flexDirection: "row" }}>
-              <Icon name="category" size={20} color={COLORS.white} />
+              <Icon name="category" size={16} color={COLORS.white} />
               <Text style={{ marginLeft: 5, color: COLORS.white }}>
                 {allBlogs.blogCategory}
               </Text>
@@ -221,16 +276,16 @@ const BlogScreen = ({ navigation }) => {
     );
   };
 
-  const RecommendedCard = ({ allBlogs }) => {
+  const RecommendedCard = ({ recentlyAddedBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("BlogContent", allBlogs)}
+        onPress={() => navigation.navigate("BlogContent", recentlyAddedBlogs)}
       >
         <ImageBackground
           style={style.rmCardImage}
           source={{
-            uri: allBlogs.blogImage,
+            uri: recentlyAddedBlogs.blogImage,
           }}
         >
           <Text
@@ -241,7 +296,7 @@ const BlogScreen = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {allBlogs.blogTitle}
+            {recentlyAddedBlogs.blogTitle}
           </Text>
           <View
             style={{
@@ -262,13 +317,13 @@ const BlogScreen = ({ navigation }) => {
               >
                 <Icon name="category" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  {allBlogs.blogCategory}
+                  {recentlyAddedBlogs.blogCategory}
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Icon name="timer" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  1 hour ago
+                  {moment(recentlyAddedBlogs.publishedOn).fromNow()}
                 </Text>
               </View>
             </View>
@@ -280,7 +335,7 @@ const BlogScreen = ({ navigation }) => {
                 textAlign: "justify",
               }}
             >
-              {allBlogs.blogContent}
+              {recentlyAddedBlogs.blogContent}
             </Text>
           </View>
         </ImageBackground>
@@ -305,7 +360,9 @@ const BlogScreen = ({ navigation }) => {
           />
           <Image
             source={{
-              uri: user.picture,
+              uri:
+                user.picture ||
+                "https://res.cloudinary.com/desnqqj6a/image/upload/v1667591378/user_1_bze4lv.png",
             }}
             style={{
               width: 50,
@@ -350,7 +407,8 @@ const BlogScreen = ({ navigation }) => {
                 <Icon name="search" size={24} />
                 <TextInput
                   placeholder="Search Blogs"
-                  style={{ color: COLORS.grey, marginLeft: 10 }}
+                  onChangeText={(text) => onSearch(text.toLocaleLowerCase())}
+                  style={{ color: COLORS.black, marginLeft: 10 }}
                 />
               </View>
             </View>
@@ -358,22 +416,79 @@ const BlogScreen = ({ navigation }) => {
           <ListCategories />
           <Text style={style.sectionTitle}>Featured Blogs</Text>
           <View>
-            <FlatList
-              contentContainerStyle={{ paddingLeft: 20 }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={allBlogs}
-              renderItem={({ item }) => <Card allBlogs={item} />}
-            />
+            {allBlogs.length != 0 ? (
+              <FlatList
+                contentContainerStyle={{ paddingLeft: 20 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={allBlogs}
+                renderItem={({ item }) => <Card allBlogs={item} />}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
             <Text style={style.sectionTitle}>Recently Added Blogs</Text>
-            <FlatList
-              snapToInterval={width - 20}
-              contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              data={allBlogs}
-              renderItem={({ item }) => <RecommendedCard allBlogs={item} />}
-            />
+
+            {recentlyAddedBlogs.length != 0 ? (
+              <FlatList
+                snapToInterval={width - 20}
+                contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                data={recentlyAddedBlogs}
+                renderItem={({ item }) => (
+                  <RecommendedCard recentlyAddedBlogs={item} />
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedLottieView
+                  source={require("../../../assets/searching.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "grey",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  No Blogs Found
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -19,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { MultiSelect } from "react-native-element-dropdown";
 import axios from "axios";
+import truncate from "truncate";
 
 const AddBlog = ({ navigation }) => {
   const body = new FormData();
@@ -47,7 +48,6 @@ const AddBlog = ({ navigation }) => {
   const [blogImage, setBlogImage] = React.useState({});
   const [blogCategory, setBlogCategory] = React.useState("");
   const [blogReference, setBlogReference] = React.useState("");
-  const [blogAuthor, setBlogAuthor] = React.useState({});
   const [similarBooks, setSimilarBooks] = React.useState([]);
   const [imageUploadStatus, setImageUploadStatus] = useState(
     "Choose Blog Picture"
@@ -90,7 +90,6 @@ const AddBlog = ({ navigation }) => {
         setLoading(false);
       }, 1000)
       .catch((err) => {
-        console.log(JSON.stringify(err));
         setLoading(false);
       });
   };
@@ -99,7 +98,6 @@ const AddBlog = ({ navigation }) => {
     getAllBooks();
   }, []);
 
-  console.log(validationErrors);
   //Publish blog
   const publishBlog = async () => {
     setError("");
@@ -127,12 +125,12 @@ const AddBlog = ({ navigation }) => {
         Alert.alert("Success", "Blog Published Successfully", [
           {
             text: "OK",
-            onPress: () => navigation.navigate("AdminBlogs"),
+            onPress: () => navigate.push("AdminBlogs"),
           },
         ]);
       })
       .catch((err) => {
-        console.log(JSON.stringify(err.response.data.data));
+        // console.log(JSON.stringify(err.response.data.data));
         if (err.response.status == 400) {
           if (err.response.data.message != "Data validation error!") {
             setError(err.response.data.message);
@@ -145,13 +143,13 @@ const AddBlog = ({ navigation }) => {
       });
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.primary }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
       <View style={style.header}>
         <Icon
           name="arrow-back-ios"
           size={28}
-          color={COLORS.black}
+          color={COLORS.white}
           onPress={navigation.goBack}
         />
       </View>
@@ -197,13 +195,13 @@ const AddBlog = ({ navigation }) => {
               }}
             >
               <View>
-                <Icon name="article" size={28} color={COLORS.white} />
+                <Icon name="article" size={28} color={COLORS.primary} />
               </View>
               <Text
                 style={{
                   fontSize: 24,
                   fontWeight: "bold",
-                  color: COLORS.white,
+                  color: COLORS.primary,
                   letterSpacing: 1,
                 }}
               >
@@ -252,7 +250,7 @@ const AddBlog = ({ navigation }) => {
                 data={books}
                 labelField="bookName"
                 valueField="_id"
-                placeholder="Select Similar Books"
+                placeholder="Select Similar Books (Optional)"
                 searchPlaceholder="Search Books"
                 value={selectedItems}
                 onChange={(item) => {
@@ -266,11 +264,11 @@ const AddBlog = ({ navigation }) => {
                         flexDirection: "row",
                         justifyContent: "space-between",
                         padding: 10,
-                        backgroundColor: "white",
+                        backgroundColor: COLORS.grey,
                         borderRadius: 5,
                         gap: 10,
-                        marginBottom: "9%",
-                        marginLeft: "8%",
+                        marginBottom: 20,
+                        marginRight: "5%",
                       }}
                     >
                       <Text
@@ -279,7 +277,7 @@ const AddBlog = ({ navigation }) => {
                           color: COLORS.black,
                         }}
                       >
-                        {item.bookName}
+                        {truncate(item.bookName, 10)}
                       </Text>
                       <Icon name="delete" size={20} color="red" />
                     </View>
@@ -312,7 +310,7 @@ const AddBlog = ({ navigation }) => {
                     borderRadius: 10,
                     alignContent: "center",
                     alignItems: "center",
-                    justifyContent: "center",
+                    top: -20,
                   }}
                 >
                   <Text
@@ -357,7 +355,7 @@ const style = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingVertical: 40,
     paddingHorizontal: 20,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     flex: 0.3,
     paddingTop: 50,
   },
@@ -423,7 +421,8 @@ const style = StyleSheet.create({
   textInput: {
     width: "100%",
     height: 50,
-    backgroundColor: "white",
+    borderColor: COLORS.primary,
+    borderWidth: 1,
     borderRadius: 10,
     paddingLeft: 10,
     marginBottom: "5%",
@@ -431,7 +430,8 @@ const style = StyleSheet.create({
   textArea: {
     width: "100%",
     height: 150,
-    backgroundColor: "white",
+    borderColor: COLORS.primary,
+    borderWidth: 1,
     borderRadius: 10,
     paddingLeft: 10,
     marginBottom: "5%",
@@ -450,7 +450,8 @@ const style = StyleSheet.create({
   ImageTextInput: {
     width: "60%",
     height: 50,
-    backgroundColor: "white",
+    borderColor: COLORS.primary,
+    borderWidth: 1,
     borderRadius: 10,
     paddingLeft: 10,
     color: "gray",
@@ -459,7 +460,7 @@ const style = StyleSheet.create({
   uploadButton: {
     width: "35%",
     height: "30%",
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",

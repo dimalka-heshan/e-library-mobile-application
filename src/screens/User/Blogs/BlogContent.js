@@ -1,3 +1,4 @@
+import moment from "moment";
 import React from "react";
 import {
   ImageBackground,
@@ -8,6 +9,7 @@ import {
   Text,
   ScrollView,
   Image,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 // import { Video } from "expo-av";
@@ -16,53 +18,9 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import truncate from "truncate";
 import COLORS from "../../../constants/color";
 
-const PopularCategories = [
-  {
-    id: 1,
-    name: "History of Sri Lanka | ශ්‍රී ලංකාවේ ඉතිහාසය in Sinhala",
-    catImg:
-      "https://upload.wikimedia.org/wikipedia/commons/2/24/1686_Mallet_Map_of_Ceylon_or_Sri_Lanka_%28Taprobane%29_-_Geographicus_-_Taprobane-mallet-1686.jpg",
-  },
-  {
-    id: 2,
-    name: "Culture of South Asia by Dr. Nalin de Silva",
-    catImg:
-      "https://strategicpsychology.com.au/wp-content/uploads/Multicultural-character.jpg",
-  },
-  {
-    id: 3,
-    name: "Nature Conservation in Sri Lanka",
-    catImg:
-      "https://images.news18.com/ibnlive/uploads/2021/07/1627448017_world-nature-conservation-day.png",
-  },
-  {
-    id: 4,
-    name: "Adventure",
-    catImg:
-      "https://warnercnr.colostate.edu/wp-content/uploads/sites/2/2017/04/shutterstock_428626417-1024x683.jpg",
-  },
-  {
-    id: 5,
-    name: "Religion",
-    catImg:
-      "https://www.jobs.ca/content/uploads/2018/03/religion-and-business.jpg",
-  },
-  {
-    id: 6,
-    name: "Food",
-    catImg:
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
-  },
-  {
-    id: 7,
-    name: "Wildlife",
-    catImg:
-      "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
-  },
-];
-
 const BlogContent = ({ navigation, route }) => {
   const allBlogs = route.params;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
@@ -96,7 +54,9 @@ const BlogContent = ({ navigation, route }) => {
             <Image
               style={{ height: 25, width: 25, borderRadius: 25 }}
               source={{
-                uri: allBlogs.blogAuthor.picture,
+                uri:
+                  allBlogs.blogAuthor.picture ||
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png",
               }}
             />
             <Text
@@ -111,7 +71,7 @@ const BlogContent = ({ navigation, route }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Icon name="timer" size={16} color={COLORS.white} />
               <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                {allBlogs.publishedOn}
+                {moment(allBlogs.publishedOn).fromNow()}
               </Text>
             </View>
           </View>
@@ -134,16 +94,16 @@ const BlogContent = ({ navigation, route }) => {
               marginTop: 20,
               lineHeight: 22,
               textAlign: "justify",
+              marginBottom: 20,
             }}
           >
             {allBlogs.blogContent}
           </Text>
 
           {/* Link references: */}
-          {allBlogs.blogReferences && (
+          {allBlogs.blogReference ? (
             <View
               style={{
-                marginTop: 20,
                 lineHeight: 22,
                 textAlign: "justify",
                 flexDirection: "column",
@@ -152,12 +112,19 @@ const BlogContent = ({ navigation, route }) => {
             >
               <Text style={{ fontWeight: "bold" }}>References:</Text>
               <View>
-                <Text style={{ color: "blue" }}>{allBlogs.blogReferences}</Text>
+                <Text
+                  style={{ color: "blue" }}
+                  onPress={() => {
+                    Linking.openURL(allBlogs.blogReference);
+                  }}
+                >
+                  {allBlogs.blogReference}
+                </Text>
               </View>
             </View>
-          )}
+          ) : null}
 
-          {allBlogs.similarBooks && (
+          {allBlogs.similarBooks.length > 0 ? (
             <View>
               <Text
                 style={
@@ -216,7 +183,7 @@ const BlogContent = ({ navigation, route }) => {
                 </View>
               </ScrollView>
             </View>
-          )}
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
