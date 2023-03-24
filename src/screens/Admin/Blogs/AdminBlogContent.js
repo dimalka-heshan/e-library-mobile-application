@@ -121,7 +121,7 @@ const AdminBlogContent = ({ navigation, route }) => {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.navigate("EditBlog")}
+                onPress={() => navigation.navigate("EditBlog", allBlogs)}
                 style={{
                   backgroundColor: COLORS.grey,
                   padding: 5,
@@ -185,7 +185,7 @@ const AdminBlogContent = ({ navigation, route }) => {
           </Text>
 
           {/* Link references: */}
-          {allBlogs.blogReferences && (
+          {allBlogs.blogReference ? (
             <View
               style={{
                 marginTop: 20,
@@ -197,12 +197,12 @@ const AdminBlogContent = ({ navigation, route }) => {
             >
               <Text style={{ fontWeight: "bold" }}>References:</Text>
               <View>
-                <Text style={{ color: "blue" }}>{allBlogs.blogReferences}</Text>
+                <Text style={{ color: "blue" }}>{allBlogs.blogReference}</Text>
               </View>
             </View>
-          )}
+          ) : null}
 
-          {allBlogs.similarBooks && (
+          {allBlogs.similarBooks.length > 0 ? (
             <View>
               <Text
                 style={
@@ -261,7 +261,7 @@ const AdminBlogContent = ({ navigation, route }) => {
                 </View>
               </ScrollView>
             </View>
-          )}
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>

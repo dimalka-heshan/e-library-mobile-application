@@ -21,50 +21,69 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const AdminBlogs = ({ navigation }) => {
-  const PopularCategories = [
-    {
-      id: 1,
-      name: "History",
-      catImg:
-        "https://upload.wikimedia.org/wikipedia/commons/2/24/1686_Mallet_Map_of_Ceylon_or_Sri_Lanka_%28Taprobane%29_-_Geographicus_-_Taprobane-mallet-1686.jpg",
-    },
-    {
-      id: 2,
-      name: "Culture",
-      catImg:
-        "https://strategicpsychology.com.au/wp-content/uploads/Multicultural-character.jpg",
-    },
-    {
-      id: 3,
-      name: "Nature",
-      catImg:
-        "https://images.news18.com/ibnlive/uploads/2021/07/1627448017_world-nature-conservation-day.png",
-    },
-    {
-      id: 4,
-      name: "Adventure",
-      catImg:
-        "https://warnercnr.colostate.edu/wp-content/uploads/sites/2/2017/04/shutterstock_428626417-1024x683.jpg",
-    },
-    {
-      id: 5,
-      name: "Religion",
-      catImg:
-        "https://www.jobs.ca/content/uploads/2018/03/religion-and-business.jpg",
-    },
-    {
-      id: 6,
-      name: "Food",
-      catImg:
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
-    },
-    {
-      id: 7,
-      name: "Wildlife",
-      catImg:
-        "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
-    },
-  ];
+  //Get total blogs
+  const [totalBlogs, setTotalBlogs] = React.useState(0);
+  const getTotalBlogs = () => {
+    axios
+      .get("/blog/getTotalBlogs")
+      .then((res) => {
+        setTotalBlogs(res.data.totalBlogs);
+        console.log("Total Blogs", res.data.totalBlogs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  //Get all recent blogs
+  const [recentBlogs, setRecentBlogs] = React.useState(0);
+  const getRecentBlogs = () => {
+    axios
+      .get("/blog/getTodaysBlogs")
+      .then((res) => {
+        setRecentBlogs(res.data.todaysBlogs);
+        console.log("Recent Blogs", res.data.todaysBlogs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  //Get total users
+  const [totalUsers, setTotalUsers] = React.useState(0);
+  const getTotalUsers = () => {
+    axios
+      .get("/user/getTotalUsers", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setTotalUsers(res.data.userCount);
+        console.log("Total Users", res.data.userCount);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  //Get total admins
+  const [totalAdmins, setTotalAdmins] = React.useState(0);
+  const getTotalAdmins = () => {
+    axios
+      .get("/user/getTotalAdmins", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setTotalAdmins(res.data.adminCount);
+        console.log("Total Admins", res.data.adminCount);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const [token, setToken] = React.useState("");
   //Get token from local storage
@@ -108,11 +127,53 @@ const AdminBlogs = ({ navigation }) => {
       });
   };
 
+  //Get recently added blogs
+  const [recentlyAddedBlogs, setRecentlyAddedBlogs] = React.useState([]);
+  const getRecentlyAddedBlogs = () => {
+    setLoading(true);
+    axios
+      .get("/blog/getRecentBlogs")
+      .then((res) => {
+        setRecentlyAddedBlogs(res.data.blogs);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     getUserDetails();
     getAllBlogs();
+    getTotalBlogs();
+    getRecentBlogs();
+    getTotalUsers();
+    getTotalAdmins();
+    getRecentlyAddedBlogs();
   }, []);
 
+  const PopularCategories = [
+    {
+      name: "Total Blogs",
+      count: totalBlogs,
+      icon: "book",
+    },
+    {
+      name: "Today's Published",
+      count: recentBlogs,
+      icon: "category",
+    },
+    {
+      name: "Total Users",
+      count: totalUsers,
+      icon: "people",
+    },
+    {
+      name: "Total Admins",
+      count: totalAdmins,
+      icon: "people",
+    },
+  ];
   const ListCategories = () => {
     return (
       <>
@@ -123,11 +184,11 @@ const AdminBlogs = ({ navigation }) => {
               marginTop: 20,
               left: 20,
               fontSize: 20,
-              fontWeight: "bold",
+              letterSpacing: 1,
             }
           }
         >
-          Popular Categories
+          Dashboard Statistics
         </Text>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           <View style={style.categoryContainer}>
@@ -139,19 +200,32 @@ const AdminBlogs = ({ navigation }) => {
                   flexDirection: "column",
                 }}
               >
-                <Image
+                <View
                   style={
                     style.iconContainer && {
-                      width: 50,
-                      height: 50,
-                      borderRadius: 50,
+                      width: 75,
+                      height: 75,
+                      borderRadius: 20,
                       objectFit: "cover",
+                      textAlign: "center",
+                      justifyContent: "center",
+                      borderColor: COLORS.primary,
+                      borderWidth: 1,
                     }
                   }
-                  source={{
-                    uri: category.catImg,
-                  }}
-                />
+                >
+                  <Text
+                    style={{
+                      color: COLORS.primary,
+                      fontSize: 20,
+                      textAlign: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {category.count}
+                  </Text>
+                </View>
 
                 <Text
                   style={{
@@ -161,6 +235,10 @@ const AdminBlogs = ({ navigation }) => {
                     marginTop: 5,
                     textAlign: "center",
                     letterSpacing: 1,
+                    width: 75,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
                   }}
                 >
                   {category.name}
@@ -219,16 +297,18 @@ const AdminBlogs = ({ navigation }) => {
     );
   };
 
-  const RecommendedCard = ({ allBlogs }) => {
+  const RecommendedCard = ({ recentlyAddedBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("AdminBlogContent", allBlogs)}
+        onPress={() =>
+          navigation.navigate("AdminBlogContent", recentlyAddedBlogs)
+        }
       >
         <ImageBackground
           style={style.rmCardImage}
           source={{
-            uri: allBlogs.blogImage,
+            uri: recentlyAddedBlogs.blogImage,
           }}
         >
           <Text
@@ -239,7 +319,7 @@ const AdminBlogs = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {allBlogs.blogTitle}
+            {recentlyAddedBlogs.blogTitle}
           </Text>
           <View
             style={{
@@ -260,7 +340,7 @@ const AdminBlogs = ({ navigation }) => {
               >
                 <Icon name="category" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  {allBlogs.blogCategory}
+                  {recentlyAddedBlogs.blogCategory}
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -278,7 +358,7 @@ const AdminBlogs = ({ navigation }) => {
                 textAlign: "justify",
               }}
             >
-              {allBlogs.blogContent}
+              {recentlyAddedBlogs.blogContent}
             </Text>
           </View>
         </ImageBackground>
@@ -394,8 +474,10 @@ const AdminBlogs = ({ navigation }) => {
               contentContainerStyle={{ paddingLeft: 20 }}
               showsHorizontalScrollIndicator={false}
               horizontal
-              data={allBlogs}
-              renderItem={({ item }) => <RecommendedCard allBlogs={item} />}
+              data={recentlyAddedBlogs}
+              renderItem={({ item }) => (
+                <RecommendedCard recentlyAddedBlogs={item} />
+              )}
             />
             <ListCategories />
           </View>

@@ -111,9 +111,25 @@ const BlogScreen = ({ navigation }) => {
       });
   };
 
+  //Get recently added blogs
+  const [recentlyAddedBlogs, setRecentlyAddedBlogs] = React.useState([]);
+  const getRecentlyAddedBlogs = () => {
+    setLoading(true);
+    axios
+      .get("/blog/getRecentBlogs")
+      .then((res) => {
+        setRecentlyAddedBlogs(res.data.blogs);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     getUserDetails();
     getAllBlogs();
+    getRecentlyAddedBlogs();
   }, []);
 
   const ListCategories = () => {
@@ -136,6 +152,7 @@ const BlogScreen = ({ navigation }) => {
           <View style={style.categoryContainer}>
             {PopularCategories.map((category, index) => (
               <View
+                key={index}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -221,16 +238,16 @@ const BlogScreen = ({ navigation }) => {
     );
   };
 
-  const RecommendedCard = ({ allBlogs }) => {
+  const RecommendedCard = ({ recentlyAddedBlogs }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("BlogContent", allBlogs)}
+        onPress={() => navigation.navigate("BlogContent", recentlyAddedBlogs)}
       >
         <ImageBackground
           style={style.rmCardImage}
           source={{
-            uri: allBlogs.blogImage,
+            uri: recentlyAddedBlogs.blogImage,
           }}
         >
           <Text
@@ -241,7 +258,7 @@ const BlogScreen = ({ navigation }) => {
               marginTop: 10,
             }}
           >
-            {allBlogs.blogTitle}
+            {recentlyAddedBlogs.blogTitle}
           </Text>
           <View
             style={{
@@ -262,7 +279,7 @@ const BlogScreen = ({ navigation }) => {
               >
                 <Icon name="category" size={16} color={COLORS.white} />
                 <Text style={{ color: COLORS.white, marginLeft: 5 }}>
-                  {allBlogs.blogCategory}
+                  {recentlyAddedBlogs.blogCategory}
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -280,7 +297,7 @@ const BlogScreen = ({ navigation }) => {
                 textAlign: "justify",
               }}
             >
-              {allBlogs.blogContent}
+              {recentlyAddedBlogs.blogContent}
             </Text>
           </View>
         </ImageBackground>
@@ -305,7 +322,9 @@ const BlogScreen = ({ navigation }) => {
           />
           <Image
             source={{
-              uri: user.picture,
+              uri:
+                user.picture ||
+                "https://res.cloudinary.com/desnqqj6a/image/upload/v1667591378/user_1_bze4lv.png",
             }}
             style={{
               width: 50,
@@ -371,8 +390,10 @@ const BlogScreen = ({ navigation }) => {
               contentContainerStyle={{ paddingLeft: 20, paddingBottom: 100 }}
               showsHorizontalScrollIndicator={false}
               horizontal
-              data={allBlogs}
-              renderItem={({ item }) => <RecommendedCard allBlogs={item} />}
+              data={recentlyAddedBlogs}
+              renderItem={({ item }) => (
+                <RecommendedCard recentlyAddedBlogs={item} />
+              )}
             />
           </View>
         </ScrollView>
