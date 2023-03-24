@@ -20,14 +20,12 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 
 import Profile from "../screens/Admin/Profile/Profile";
-import Blogs from "../screens/Admin/Blogs/Blogs";
 
 import Advertisement from "../screens/Admin/Advertisements/AllAdvertisementsScreen";
 import AddAdvertisementScreen from "../screens/Admin/Advertisements/AddAdvertisementScreen";
 import UpdateAdvertisementScreen from "../screens/Admin/Advertisements/UpdateAdvertisementScreen";
 import AdvertisementDetails from "../screens/Admin/Advertisements/AdvertisementDetails";
 import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
-import Advertisement from "../screens/Admin/Advertisements/Advertisements";
 
 import AddBookScreen from "../screens/Admin/Books/AddBookScreen";
 import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
