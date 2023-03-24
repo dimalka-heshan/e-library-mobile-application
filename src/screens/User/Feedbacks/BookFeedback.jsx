@@ -16,6 +16,7 @@ import {
   responsiveFontSize,
 } from "react-native-responsive-dimensions";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const book = {
   id: 1,
@@ -75,43 +76,70 @@ const book = {
 ];
 
 
-
-const BookFeedback = ({navigation}) => {
+const BookFeedback = ({navigation, route}) => {
   const [loading, setLoading] = React.useState(false);
   const [createdAt, setCreatedAt] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedbacks, setFeedbacks] = useState([]);
   const [rating, setRating] = useState("");
 
-  // const getAllFeedbacks = async () => {
-  //   setLoading(true);
-  //   const { bookID } = route.params;
+  const book = route.params;
 
-  //   await axios
-  //     .get(`feedback/getFeedbacks/${bookID}`)
-  //     .then((res) => {
-  //       setLoading(false);
-  //       setFeedback(res.data.feedbacks.feedback);
-  //       setCreatedAt(res.data.feedbacks.createdAt);
-  //       setRating(res.data.feedbacks.rating);
-  //     })
-  //     .catch((err) => {
-  //       setLoading(false);
-  //       if (err.response.status == 400) {
-  //         if (err.response.data.message != "Data validation error!") {
-  //           setError(err.response.data.message);
-  //         } else {
-  //           setValidationErrors(err.response.data.data);
-  //         }
-  //       } else {
-  //         setError("Something went wrong!");
-  //       }
-  //     });
-  // };
 
-  //   useEffect(() => {
-  //      getAllFeedbacks()
-  //   }, []);
+  const [token, setToken] = React.useState("");
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
+  const [user, setUser] = React.useState("");
+  
 
+  const getUserDetails = () => {
+    setLoading(true);
+    axios
+      .get("/user/profile", { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => {
+        setUser(res.data.user);
+        // console.log(res.data.user.firstName);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+      });
+  };
+
+  
+  const getAllFeedbacks = async () => {
+    setLoading(true);
+
+    await axios
+      .get(`/feedback/getFeedbacks/${book._id}`)
+      .then((res) => {
+        // console.log(res.data.feedbacks);
+
+        setLoading(false);
+        setFeedbacks(res.data.feedbacks);
+      })
+      .catch((err) => {
+        setLoading(false);
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setError(err.response.data.message);
+          } else {
+            setValidationErrors(err.response.data.data);
+          }
+        } else {
+          setError("Something went wrong!");
+        }
+      });
+  };
+
+  useEffect(() => {
+    getAllFeedbacks();
+    getUserDetails();
+  }, [token]);
+
+  // console.log(user.firstName);
+
+  
   return (
     <SafeAreaView
       style={{
@@ -126,21 +154,23 @@ const BookFeedback = ({navigation}) => {
 
       <Text
         style={{
-          fontSize: 27,
-          marginLeft: "3%",
+          fontSize: 30,
+          marginLeft: "30%",
           fontWeight: "bold",
           marginTop: "2%",
+          marginBottom: "1%",
           width: "100%",
-          color: COLORS.dark,
+          color: COLORS.blue,
           fontWeight: "bold",
+          
         }}
       >
-        User Feedbacks : {book.name}
+        User Feedbacks
       </Text>
 
       <View style={style.buttonContainer}>
         <TouchableOpacity
-          onPress={() => navigation.push("createFeedback")}
+          onPress={() => navigation.push("CreateFeedback")}
           style={style.getStartedButton}
         >
           <Text style={style.buttonText}>Add Feedback</Text>
@@ -148,44 +178,12 @@ const BookFeedback = ({navigation}) => {
         </TouchableOpacity>
       </View>
 
-      <View style={style.mypost}>
-        <TouchableOpacity key={mycomment.id}>
-          <View style={style.postContent}>
-            <Text style={style.postTitle}>
-              {mycomment.name} |{" "}
-              <Icon
-                justifyContent="flex-end"
-                name="star"
-                size={responsiveFontSize(4)}
-                color="#ffb300"
-              />
-              {mycomment.rating}/5
-            </Text>
-            <View
-              style={{
-                width: "10%",
-              }}
-            >
-              <TouchableOpacity style={style.editButton}>
-                <Icon name="edit" size={35} color={COLORS.blue} />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={style.deleteButton}>
-              <Icon name="delete" size={35} color={COLORS.red} />
-            </TouchableOpacity>
-
-            <Text style={style.postMeta}>| {mycomment.date}</Text>
-            <Text style={style.postExcerpt}>{mycomment.comment}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView>
-        {posts.map((post) => (
+        {feedbacks.map((post) => (
           <TouchableOpacity key={post.id} style={style.post}>
             <View style={style.postContent}>
               <Text style={style.postTitle}>
-                {post.name} |{" "}
+               User - {user.fullName}
                 <Icon
                   justifyContent="flex-end"
                   name="star"
@@ -194,8 +192,33 @@ const BookFeedback = ({navigation}) => {
                 />
                 {post.rating}/5
               </Text>
-              <Text style={style.postMeta}>| {post.date}</Text>
-              <Text style={style.postExcerpt}>{post.comment}</Text>
+             {
+              post.user._id === user._id ? (
+                <View
+                style={{
+                  width: "10%",
+                  marginLeft:"77%",
+                  flexDirection:"row",
+                  alignItems:"center"
+                }}
+              >
+                <TouchableOpacity >
+                  <Icon name="edit" size={35} color={COLORS.blue} />
+                </TouchableOpacity>
+              <View style={{
+                  marginLeft:"30%",
+                  
+                }} >
+              <TouchableOpacity >
+                <Icon name="delete" size={35} color={COLORS.red} />
+              </TouchableOpacity>
+              </View>
+              </View>
+              ) : null
+             }
+              
+              <Text style={style.postMeta}>| {post.createdAt}</Text>
+              <Text style={style.postExcerpt}>{post.feedback}</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -217,9 +240,9 @@ const BookFeedback = ({navigation}) => {
     },
 
     post: {
+      marginTop:"-1%",
       marginBottom: 20,
-      backgroundColor: "#fff",
-      
+      backgroundColor: "#E5E4E2",
       marginLeft: 20,
       marginRight: 20,
       borderRadius: 10,
@@ -232,6 +255,7 @@ const BookFeedback = ({navigation}) => {
     },
     
     postContent: {
+      marginTop:"0%",
       padding: 20,
     },
     postTitle: {
@@ -281,15 +305,16 @@ const BookFeedback = ({navigation}) => {
       marginLeft: 5
     },
     getStartedButton: {
-      width: responsiveWidth(60),
+      width: responsiveWidth(55),
       height: responsiveHeight(6),
       backgroundColor: COLORS.green,
       borderRadius: 15,
+      marginRight:"2%",
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-around",
       alignItems: "center",
-      marginTop: responsiveHeight(-10),
+      marginTop: responsiveHeight(-5),
       maxWidth: 200,
     },
     

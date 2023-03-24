@@ -83,7 +83,7 @@ const BookScreen = ({ navigation, route }) => {
               >
                 {book.bookAuthor}
               </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("BookFeedback")}>
+              <TouchableOpacity onPress={() => navigation.push("BookFeedback",book)}>
                 <Text
                   style={{
                     fontSize: 15,

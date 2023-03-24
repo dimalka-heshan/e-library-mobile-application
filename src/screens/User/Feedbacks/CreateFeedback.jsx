@@ -12,50 +12,50 @@ import axios from 'axios';
   
 
 
-// const createFeedback = ({navigation}) => {
-//   const body = new FormData();
-//   const { bookID } = route.params;
-//     const [starRating, setStarRating] = useState(null);
-//     const [loading, setLoading] = React.useState(false);
-//     const [error, setError] = useState("");
+const CreateFeedback = ({navigation}) => {
+  const body = new FormData();
+  const { bookID } = route.params;
+    const [starRating, setStarRating] = useState(null);
+    const [loading, setLoading] = React.useState(false);
+    const [error, setError] = useState("");
 
 
-//   const publishFeedback = async () => {
-//     setLoading(true);
-//     setError("");
+  // const publishFeedback = async () => {
+  //   setLoading(true);
+  //   setError("");
 
-//     const body = new FormData();
-//     body.append("feedback", feedback);
-//     body.append("rating", rating);
+  //   const body = new FormData();
+  //   body.append("feedback", feedback);
+  //   body.append("rating", rating);
 
-//     await axios
-//       .post("feedback/createFeedback/${bookID}", body, {
-//         headers: {
-//           "Contest-Type": "multipart/form-data",
-//         },
-//       })
-//       .then((res) => {
-//         setLoading(false);
-//         Alert.alert("Success", "Feedback Published Successfully", [
-//           {
-//             text: "OK",
-//             onPress: () => navigation.push("BookFeedback"),
-//           },
-//         ]);
-//       })
-//       .catch((err) => {
-//         setLoading(false);
-//         if (err.response.status == 400) {
-//           if (err.response.data.message != "Data validation error!") {
-//             setError(err.response.data.message);
-//           } else {
-//             setValidationErrors(err.response.data.data);
-//           }
-//         } else {
-//           setError("Something went wrong!");
-//         }
-//       });
-//   };
+  //   await axios
+  //     .post("feedback/createFeedback/${bookID}", body, {
+  //       headers: {
+  //         "Contest-Type": "multipart/form-data",
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setLoading(false);
+  //       Alert.alert("Success", "Feedback Published Successfully", [
+  //         {
+  //           text: "OK",
+  //           onPress: () => navigation.push("BookFeedback"),
+  //         },
+  //       ]);
+  //     })
+  //     .catch((err) => {
+  //       setLoading(false);
+  //       if (err.response.status == 400) {
+  //         if (err.response.data.message != "Data validation error!") {
+  //           setError(err.response.data.message);
+  //         } else {
+  //           setValidationErrors(err.response.data.data);
+  //         }
+  //       } else {
+  //         setError("Something went wrong!");
+  //       }
+  //     });
+  // };
 
 
   return (
@@ -155,7 +155,7 @@ import axios from 'axios';
   );
 }
 
-export default createFeedback;
+export default CreateFeedback;
 
 
 const styles = StyleSheet.create({

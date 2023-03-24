@@ -25,7 +25,7 @@ import HomeScreen from "../screens/User/Books/HomeScreen";
 import BookScreen from "../screens/User/Books/BookScreen";
 
 import BookFeedback from "../screens/User/Feedbacks/BookFeedback";
-import createFeedback from "../screens/User/Feedbacks/CreateFeedback"
+import CreateFeedback from "../screens/User/Feedbacks/CreateFeedback"
 
 import Profile from "../screens/User/Profile/Profile";
 
@@ -72,8 +72,8 @@ function BooksStackScreen() {
       />
 
       <BooksStack.Screen
-        name="createFeedback"
-        component={createFeedback}
+        name="CreateFeedback"
+        component={CreateFeedback}
         options={{
           headerShown: false,
         }}
