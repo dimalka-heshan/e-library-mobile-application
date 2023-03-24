@@ -104,16 +104,19 @@ const BookFeedback = ({ navigation, route }) => {
       });
   };
 
+  
+
   const getAllFeedbacks = async () => {
     setLoading(true);
 
     await axios
       .get(`/feedback/getFeedbacks/${book}`)
       .then((res) => {
-        // console.log(res.data.feedbacks._id);
+        
 
         setLoading(false);
         setFeedbacks(res.data.feedbacks);
+        // console.log(res.data.feedbacks._id);
       })
       .catch((err) => {
         setLoading(false);
@@ -199,7 +202,7 @@ const BookFeedback = ({ navigation, route }) => {
 
       <ScrollView>
         {feedbacks.map((post) => (
-          <TouchableOpacity key={post.id} style={style.post}>
+          <TouchableOpacity key={post._id} style={style.post}>
             <View style={style.postContent}>
               <Text style={style.postTitle}>
                 User - {user.fullName}
@@ -220,7 +223,10 @@ const BookFeedback = ({ navigation, route }) => {
                     alignItems: "center",
                   }}
                 >
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                  onPress={() => {
+                    navigation.push("UpdateFeedback",post);
+                  }}>
                     <Icon name="edit" size={35} color={COLORS.blue} />
                   </TouchableOpacity>
                   <View

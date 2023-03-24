@@ -137,11 +137,15 @@ const CreateFeedback = ({ navigation, route }) => {
 
       <View style={styles.textInputContainer}>
         <View style={styles.loginContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Your Feedback"
-            onChangeText={(text) => setFeedBack(text)}
-          />
+        <TextInput
+                  style={styles.textArea}
+                  placeholder="Enter your Feedback"
+                  multiline={true}
+                  numberOfLines={20}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  onChangeText={(text) => setFeedBack(text)}
+                />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.submitButton}
@@ -150,6 +154,7 @@ const CreateFeedback = ({ navigation, route }) => {
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
           </View>
+          
         </View>
       </View>
     </SafeAreaView>
@@ -169,7 +174,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 2,
     // height: 50,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
     height: "50%",
     alignSelf: "center",
     marginTop: responsiveHeight(-5),
-    backgroundColor: "white",
+    
   },
   loginContainer: {
     width: "100%",
@@ -230,5 +234,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 27,
+  },
+  textArea: {
+    width: "100%",
+    height: 200,
+    backgroundColor: "white",
+    padding: 10,
+    marginBottom: "5%",
+    textAlignVertical: "top",
+
+    borderRadius: 10,
   },
 });
