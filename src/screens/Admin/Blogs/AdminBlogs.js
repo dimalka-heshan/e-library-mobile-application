@@ -150,7 +150,7 @@ const AdminBlogs = ({ navigation }) => {
     getTotalUsers();
     getTotalAdmins();
     getRecentlyAddedBlogs();
-  }, []);
+  }, [token]);
 
   const PopularCategories = [
     {
@@ -370,7 +370,6 @@ const AdminBlogs = ({ navigation }) => {
       <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
         <StatusBar translucent={false} backgroundColor={COLORS.primary} />
         <View style={style.header}>
-          {/* <Icon name="sort" size={28} color={COLORS.white} /> */}
           <ImageBackground
             source={{
               uri: "https://www.graphicsprings.com/filestorage/stencils/2f3bdb9733c4a68659dc2900a7595fea.png?width=500&height=500",

@@ -54,9 +54,19 @@ const EditBlog = ({ navigation, route }) => {
   const [imageUploadStatus, setImageUploadStatus] = useState(
     "Choose Blog Picture"
   );
-  const [selectedItems, setSelectedItems] = useState(allBlogs.similarBooks);
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  console.log(selectedItems);
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState("");
+
+  const filterSimilarBooks = (item) => {
+    let temp = [];
+    for (let i = 0; i < allBlogs.similarBooks.length; i++) {
+      temp.push(allBlogs.similarBooks[i]._id);
+    }
+    setSelectedItems(temp);
+  };
 
   //for Image upload
   const pickImage = async () => {
@@ -99,6 +109,7 @@ const EditBlog = ({ navigation, route }) => {
 
   React.useEffect(() => {
     getAllBooks();
+    filterSimilarBooks();
   }, []);
 
   console.log(validationErrors);
@@ -118,7 +129,7 @@ const EditBlog = ({ navigation, route }) => {
     }
 
     await axios
-      .post("/blog/createBlog", body, {
+      .patch(`/blog/updateBlog/${allBlogs._id}`, body, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -134,7 +145,7 @@ const EditBlog = ({ navigation, route }) => {
         ]);
       })
       .catch((err) => {
-        console.log(JSON.stringify(err.response.data.data));
+        console.log(JSON.stringify(err.response));
         if (err.response.status == 400) {
           if (err.response.data.message != "Data validation error!") {
             setError(err.response.data.message);
@@ -266,7 +277,10 @@ const EditBlog = ({ navigation, route }) => {
                 }}
                 renderItem={renderItem}
                 renderSelectedItem={(item, unSelect) => (
-                  <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+                  <TouchableOpacity
+                    onPress={() => unSelect && unSelect(item)}
+                    key={item}
+                  >
                     <View
                       style={{
                         flexDirection: "row",

@@ -130,7 +130,7 @@ const BlogScreen = ({ navigation }) => {
     getUserDetails();
     getAllBlogs();
     getRecentlyAddedBlogs();
-  }, []);
+  }, [token]);
 
   const ListCategories = () => {
     return (

@@ -121,7 +121,7 @@ const AdminBlogContent = ({ navigation, route }) => {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.navigate("EditBlog", allBlogs)}
+                onPress={() => navigation.push("EditBlog", allBlogs)}
                 style={{
                   backgroundColor: COLORS.grey,
                   padding: 5,
