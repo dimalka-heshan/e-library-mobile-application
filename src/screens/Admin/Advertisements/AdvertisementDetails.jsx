@@ -99,6 +99,7 @@ const AdvertisementDetails = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>{adTitle}</Text>
         <View style={styles.meta}>
+          <Text style={styles.author}>by {post.author}</Text>
           <Text style={styles.date}>
             Published - {moment(createdAt).subtract(10, "days").calendar()}
           </Text>
@@ -214,9 +215,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 10,
     paddingLeft: 20,
-    paddingTop: 25,
+    paddingTop: 20,
   },
   meta: {
     flexDirection: "row",

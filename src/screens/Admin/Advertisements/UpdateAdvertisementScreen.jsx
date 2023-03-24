@@ -7,8 +7,9 @@ import {
   Image,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   responsiveHeight,
   responsiveWidth,
@@ -17,25 +18,53 @@ import COLORS from "../../../constants/color";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomTextInput from "../../../components/CustomTextInput/CustomTextInout";
 import * as ImagePicker from "expo-image-picker";
+import { useRoute } from "@react-navigation/native";
+import axios from "axios";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 
 const UpdateAdvertisement = ({ navigation }) => {
-  const [AdvertisementName, setAdvertisementName] = useState("");
-  const [AdvertisementVideoUrl, setAdvertisementVideoUrl] = useState("");
-  const [AdvertisementDescription, setAdvertisementDescription] = useState("");
-  const [AdvertisementImage, setAdvertisementImage] = useState(null);
+  const [adTitle, setAdTitle] = useState("");
+  const [adVideoUrl, setAdVideoUrl] = useState("");
+  const [adDescription, setAdDescription] = useState("");
+  const [advertisementBanner, setAdvertisementBanner] = useState(null);
+  const [loading, setLoading] = React.useState(false);
   const [imageUploadStatus, setImageUploadStatus] = useState(
     "Choose Advertisement Picture"
   );
   const [selectedItems, setSelectedItems] = useState([]);
 
-  //For Multiple selection
-  const renderItem = (item) => {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.selectedTextStyle}>{item.label}</Text>
-      </View>
-    );
+  var route = useRoute();
+
+  const GetAdvertisement = async () => {
+    setLoading(true);
+    const { advertisementId } = route.params;
+
+    await axios
+      .get(`/advertisement/getAdvertisement/${advertisementId}`)
+      .then((res) => {
+        setLoading(false);
+        setAdTitle(res.data.advertisement.adTitle);
+        setAdVideoUrl(res.data.advertisement.adVideoUrl);
+        setAdDescription(res.data.advertisement.adDescription);
+        setAdvertisementBanner(res.data.advertisement.advertisementBanner);
+      })
+      .catch((err) => {
+        setLoading(false);
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setError(err.response.data.message);
+          } else {
+            setValidationErrors(err.response.data.data);
+          }
+        } else {
+          setError("Something went wrong!");
+        }
+      });
   };
+
+  useEffect(() => {
+    GetAdvertisement();
+  }, []);
 
   //for Image upload
   const pickImage = async () => {
@@ -47,80 +76,139 @@ const UpdateAdvertisement = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      setAdvertisementImage(result);
-      setImageUploadStatus("Advertisement Picture Uploaded");
+      setAdvertisementBanner(result.assets[0].uri);
+      setImageUploadStatus("Picture Uploaded");
     } else {
-      setAdvertisementImage(null);
+      setAdvertisementBanner(null);
       setImageUploadStatus("Choose Advertisement Picture");
     }
   };
 
+  //Update Organization
+  const UpdateAdvertisement = async () => {
+    setLoading(true);
+    const { advertisementId } = route.params;
+
+    const body = new FormData();
+    body.append("adTitle", adTitle);
+    body.append("adDescription", adDescription);
+    body.append("adVideoUrl", adVideoUrl);
+    body.append("file", {
+      uri: advertisementBanner,
+      mimeType: "image/jpeg",
+      name: "image.jpg",
+    });
+
+    console.log(JSON.stringify(body));
+
+    await axios
+      .patch(`/advertisement/updateAdvertisement/${advertisementId}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setLoading(false);
+        Alert.alert("Success", "Advertisement updated successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.push("Advertisement"),
+          },
+        ]);
+      })
+      .catch((err) => {
+        setLoading(false);
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setError(err.response.data.message);
+          } else {
+            setValidationErrors(err.response.data.data);
+          }
+        } else {
+          setError("Something went wrong!");
+        }
+      });
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
-    >
-      <View style={styles.arrowHeader}>
-        <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-      </View>
-      <View
-        style={{
-          width: "80%",
-          alignSelf: "center",
-        }}
+    <>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
       >
-        <Text style={styles.header}>Add Advertisement</Text>
-      </View>
-      <ScrollView
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <View style={styles.container}>
-          <View style={styles.textInputContainer}>
-            <View style={styles.loginContainer}>
-              <CustomTextInput
-                placeholder="Advertisement Title"
-                onChangeText={setAdvertisementName}
-              />
-              <TextInput
-                style={styles.textArea}
-                placeholder="Advertisement Description"
-                multiline={true}
-                numberOfLines={20}
-                onChangeText={(text) => setAdvertisementDescription(text)}
-              />
-              <View style={styles.imageUploadField}>
-                <TextInput
-                  style={styles.ImageTextInput}
-                  placeholder="Choose File"
-                  editable={false}
-                  selectTextOnFocus={false}
-                  value={imageUploadStatus}
+        <View style={styles.arrowHeader}>
+          <Icon
+            name="arrow-back"
+            size={28}
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+        <View
+          style={{
+            width: "80%",
+            alignSelf: "center",
+          }}
+        >
+          <Text style={styles.header}>Update Advertisement</Text>
+        </View>
+        <ScrollView
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <View style={styles.container}>
+            <View style={styles.textInputContainer}>
+              <View style={styles.loginContainer}>
+                <CustomTextInput
+                  placeholder="Advertisement Title"
+                  value={adTitle}
+                  onChangeText={setAdTitle}
                 />
-                <TouchableOpacity
-                  onPress={pickImage}
-                  style={styles.uploadButton}
-                >
-                  <Text style={styles.uploadTxt}>Upload</Text>
-                </TouchableOpacity>
-              </View>
-              <CustomTextInput
-                placeholder="Advertisement Video Link"
-                onChangeText={setAdvertisementVideoUrl}
-              />
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>
-                    Update Advertisement
-                  </Text>
-                </TouchableOpacity>
+                <TextInput
+                  style={styles.textArea}
+                  placeholder="Advertisement Description"
+                  multiline={true}
+                  numberOfLines={20}
+                  value={adDescription}
+                  onChangeText={(text) => setAdDescription(text)}
+                />
+                <View style={styles.imageUploadField}>
+                  <TextInput
+                    style={styles.ImageTextInput}
+                    placeholder="Choose File"
+                    editable={false}
+                    selectTextOnFocus={false}
+                    value={advertisementBanner}
+                  />
+                  <TouchableOpacity
+                    onPress={pickImage}
+                    style={styles.uploadButton}
+                  >
+                    <Text style={styles.uploadTxt}>Upload</Text>
+                  </TouchableOpacity>
+                </View>
+                <CustomTextInput
+                  placeholder="Advertisement Video Link"
+                  value={adVideoUrl}
+                  onChangeText={setAdVideoUrl}
+                />
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={UpdateAdvertisement}
+                    style={styles.loginButton}
+                  >
+                    <Text style={styles.loginButtonText}>
+                      Update Advertisement
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      {loading ? <CustomLoading /> : null}
+    </>
   );
 };
 
@@ -184,7 +272,7 @@ const styles = StyleSheet.create({
   },
 
   loginButton: {
-    width: "100%",
+    width: "120%",
     height: "30%",
     paddingLeft: 10,
     paddingRight: 10,
@@ -201,6 +289,8 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: "white",
     fontWeight: "bold",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   LogoImage: {

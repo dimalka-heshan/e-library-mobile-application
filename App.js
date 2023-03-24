@@ -18,7 +18,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* <Stack.Screen
+        <Stack.Screen
           options={{ headerShown: false }}
           name="LandingScreen"
           component={LandingScreen}
@@ -34,15 +34,15 @@ export default function App() {
           options={{ headerShown: false }}
           name="SignUpScreen"
           component={SignUpScreen}
-        /> */}
+        />
 
-        {/* <Stack.Screen
+        <Stack.Screen
           name="UserTabs"
           component={UserTabs}
           options={{
             headerShown: false,
           }}
-        /> */}
+        />
 
         <Stack.Screen
           name="AdminTabs"

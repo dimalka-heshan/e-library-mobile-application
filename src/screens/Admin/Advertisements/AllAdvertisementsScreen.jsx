@@ -8,9 +8,11 @@ import {
   TextInput,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Alert,
+  Button,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   responsiveHeight,
   responsiveWidth,
@@ -18,125 +20,243 @@ import {
 import COLORS from "../../../constants/color";
 import TempAdvertisements from "../../../constants/book";
 import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
+import axios from "axios";
+import moment from "moment";
 
 const AllAdvertisementsScreen = ({ navigation }) => {
-  return (
-    <SafeAreaView
-      style={{
-        marginBottom: 80,
-      }}
-    >
-      <View
-        style={{
-          width: "80%",
-          alignSelf: "center",
-          marginTop: "8%",
-          height: "8%",
-        }}
-      >
-        <Text style={styles.header}>Advertisements</Text>
-      </View>
+  const [allAdvertisements, setAllAdvertisements] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
-      <View
+  const getAllAdvertisements = () => {
+    setLoading(true);
+    axios
+      .get("/advertisement/getAllAdvertisements")
+      .then((res) => {
+        setAllAdvertisements(res.data.advertisements);
+        setLoading(false);
+      }, 1000)
+      .catch((err) => {
+        setLoading(false);
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setError(err.response.data.message);
+          } else {
+            setValidationErrors(err.response.data.data);
+          }
+        } else {
+          setError("Something went wrong!");
+        }
+      });
+  };
+
+  useEffect(() => {
+    getAllAdvertisements();
+  }, []);
+
+  const filterData = (advertisements, searchKey) => {
+    const result = advertisements.filter((advertisement) =>
+      advertisement.adTitle.toLowerCase().includes(searchKey)
+    );
+    setAllAdvertisements(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get(`/advertisement/getAllAdvertisements`)
+      .then((res) => {
+        filterData(res.data.advertisements, e.toLowerCase());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  //Delete Advertisement
+  const deleteAdvertisement = async (ID) => {
+    setLoading(true);
+    await axios
+      .delete(`/advertisement/deleteAdvertisement/${ID}`)
+      .then((res) => {
+        setLoading(false);
+        Alert.alert("Success", "Advertisement deleted successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.push("Advertisement"),
+          },
+        ]);
+      })
+      .catch((err) => {
+        setLoading(false);
+        if (err.response.status == 400) {
+          if (err.response.data.message != "Data validation error!") {
+            setError(err.response.data.message);
+          } else {
+            setValidationErrors(err.response.data.data);
+          }
+        } else {
+          setError("Something went wrong!");
+        }
+      });
+  };
+
+  return (
+    <>
+      <SafeAreaView
         style={{
-          width: "100%",
-          height: "8%",
-          paddingLeft: "2.5%",
-          paddingRight: "2.5%",
+          marginBottom: 80,
         }}
       >
-        <View style={{ flexDirection: "row", padding: "3%" }}>
-          <View style={styles.searchContainer}>
-            <Icon name="search" size={25} style={{ marginLeft: 20 }} />
-            <TextInput placeholder="Search" style={styles.input} />
+        <View
+          style={{
+            width: "80%",
+            alignSelf: "center",
+            marginTop: "8%",
+            height: "8%",
+          }}
+        >
+          <Text style={styles.header}>Advertisements</Text>
+        </View>
+
+        <View
+          style={{
+            width: "100%",
+            height: "8%",
+            paddingLeft: "2.5%",
+            paddingRight: "2.5%",
+          }}
+        >
+          <View style={{ flexDirection: "row", padding: "3%" }}>
+            <View style={styles.searchContainer}>
+              <Icon name="search" size={25} style={{ marginLeft: 20 }} />
+              <TextInput
+                placeholder="Search"
+                style={styles.input}
+                onChangeText={(text) => onSearch(text)}
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      <ScrollView
-        style={{
-          width: "100%",
-          height: "100%",
-          marginTop: "5%",
-        }}
-      >
-        <View style={styles.container}>
-          {TempAdvertisements.map((Advertisement) => (
-            <View key={Advertisement.id} style={styles.AdvertisementContainer}>
-              <Image
-                source={{
-                  uri: "https://www.bootdey.com/image/280x280/00BFFF/000000",
-                }}
-                style={styles.AdvertisementImage}
-              />
-              <View
-                style={{
-                  width: "50%",
-                  height: "100%",
-                  justifyContent: "center",
-                  marginLeft: "5%",
-                }}
+        <TouchableOpacity
+          onPress={() => navigation.push("AddAdvertisementScreen")}
+          style={styles.loginButton}
+        >
+          <Text style={styles.loginButtonText}>Add New Advertisement</Text>
+        </TouchableOpacity>
+
+        <ScrollView
+          style={{
+            width: "100%",
+            height: "100%",
+            marginTop: "2.5%",
+          }}
+        >
+          <View style={styles.container}>
+            {allAdvertisements.map((Advertisement) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.push("AdvertisementDetails", {
+                    advertisementId: Advertisement._id,
+                  })
+                }
               >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    marginTop: "-25%",
-                  }}
-                >
-                  {Advertisement.name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: "gray",
-                    marginTop: 1,
-                  }}
-                >
-                  {Advertisement.price}
-                </Text>
                 <View
-                  style={{
-                    display: "flex",
-                    width: "25%",
-                    flexDirection: "row",
-                    alignContent: "center",
-                    alignSelf: "center",
-                    marginLeft: "30%",
-                    marginTop: "10%",
-                    marginBottom: "-25%",
-                  }}
+                  key={Advertisement._id}
+                  style={styles.AdvertisementContainer}
                 >
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.push("UpdateAdvertisementScreen");
+                  <Image
+                    source={{ uri: Advertisement.advertisementBanner }}
+                    style={styles.AdvertisementImage}
+                  />
+                  <View
+                    style={{
+                      width: "50%",
+                      height: "100%",
+                      justifyContent: "center",
+                      marginLeft: "5%",
                     }}
                   >
-                    <Icon name="edit" size={24} color={COLORS.blue} />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity>
-                    <Icon
-                      name="delete"
-                      size={24}
-                      color="red"
+                    <Text
                       style={{
-                        marginLeft: "5%",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        marginTop: "-25%",
                       }}
-                    />
-                  </TouchableOpacity>
+                    >
+                      {Advertisement.adTitle}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: "gray",
+                        marginTop: 1,
+                      }}
+                    >
+                      Published -{" "}
+                      {moment(Advertisement.createdAt)
+                        .subtract(10, "days")
+                        .calendar()}
+                    </Text>
+                    <View
+                      style={{
+                        display: "flex",
+                        width: "25%",
+                        flexDirection: "row",
+                        alignContent: "center",
+                        alignSelf: "center",
+                        marginLeft: "-75%",
+                        marginTop: "10%",
+                        marginBottom: "-25%",
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          navigation.push("UpdateAdvertisementScreen", {
+                            advertisementId: Advertisement._id,
+                          });
+                        }}
+                      >
+                        <Icon name="edit" size={24} color={COLORS.blue} />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => {
+                          Alert.alert(
+                            "Delete Advertisement",
+                            "Are you sure you want to delete this advertisement?",
+                            [
+                              {
+                                text: "OK",
+                                onPress: () =>
+                                  deleteAdvertisement(Advertisement._id),
+                              },
+                              {
+                                text: "Cancel",
+                                onPress: () => console.log("Cancel Pressed"),
+                              },
+                            ]
+                          );
+                        }}
+                      >
+                        <Icon
+                          name="delete"
+                          size={24}
+                          color="red"
+                          style={{
+                            marginLeft: "5%",
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-              </View>
-            </View>
-          ))}
-          <TouchableOpacity
-            onPress={() => navigation.push("AddAdvertisementScreen")}
-          >
-            <Icon name="add" size={30} style={{ marginLeft: "80%" }} />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      {loading ? <CustomLoading /> : null}
+    </>
   );
 };
 
@@ -200,5 +320,21 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.dark,
     marginLeft: 10,
+  },
+  loginButton: {
+    width: "50%",
+    backgroundColor: COLORS.blue,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: "white",
+    minHeight: 50,
+    marginLeft: "45%",
+  },
+
+  loginButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

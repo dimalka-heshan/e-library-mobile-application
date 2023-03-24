@@ -1,15 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import LottieView from "lottie-react-native";
+import COLORS from "../../constants/color";
 
 const CustomLoading = () => {
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>
-      <LottieView
-        source={require("../../assets/loading.json")}
-        style={{ width: 100, height: 100 }}
-        autoPlay
-        loop
-      />
+      {/* <LottieView
+       autoPlay
+       loop
+       source={require("../../assets/loading.json")}
+       style={{ width: 100, height: 100 }}
+     /> */}
+      <ActivityIndicator size="large" />
     </View>
   );
 };

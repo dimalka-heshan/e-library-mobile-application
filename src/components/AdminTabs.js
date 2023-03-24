@@ -25,6 +25,7 @@ import Blogs from "../screens/Admin/Blogs/Blogs";
 import Advertisement from "../screens/Admin/Advertisements/AllAdvertisementsScreen";
 import AddAdvertisementScreen from "../screens/Admin/Advertisements/AddAdvertisementScreen";
 import UpdateAdvertisementScreen from "../screens/Admin/Advertisements/UpdateAdvertisementScreen";
+import AdvertisementDetails from "../screens/Admin/Advertisements/AdvertisementDetails";
 
 import AddBookScreen from "../screens/Admin/Books/AddBookScreen";
 import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
@@ -99,6 +100,13 @@ function AdvertisementStackScreen() {
       <AdvertisementStack.Screen
         name="UpdateAdvertisementScreen"
         component={UpdateAdvertisementScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <AdvertisementStack.Screen
+        name="AdvertisementDetails"
+        component={AdvertisementDetails}
         options={{
           headerShown: false,
         }}
