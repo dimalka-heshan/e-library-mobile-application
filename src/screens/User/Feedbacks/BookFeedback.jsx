@@ -2,10 +2,12 @@ import {
   View,
   SafeAreaView,
   Image,
+  ImageBackground,
   Text,
   StyleSheet,
   TouchableOpacity,
   Alert,
+  StatusBar
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -104,16 +106,12 @@ const BookFeedback = ({ navigation, route }) => {
       });
   };
 
-  
-
   const getAllFeedbacks = async () => {
     setLoading(true);
 
     await axios
       .get(`/feedback/getFeedbacks/${book}`)
       .then((res) => {
-        
-
         setLoading(false);
         setFeedbacks(res.data.feedbacks);
         // console.log(res.data.feedbacks._id);
@@ -164,17 +162,16 @@ const BookFeedback = ({ navigation, route }) => {
   // console.log(feedbacks);
 
   return (
-    <SafeAreaView
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: COLORS.light,
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+      <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
+      <ImageBackground
+        style={{marginBottom: 20}}
+        source={require("../../../assets/images/onboardImage1.jpg")}
+      >
       <View style={style.header}>
         <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
       </View>
-
+      
       <Text
         style={{
           fontSize: 30,
@@ -183,23 +180,23 @@ const BookFeedback = ({ navigation, route }) => {
           marginTop: "2%",
           marginBottom: "1%",
           width: "100%",
-          color: COLORS.blue,
+          color: COLORS.white,
           fontWeight: "bold",
         }}
       >
         User Feedbacks
       </Text>
-
+      
       <View style={style.buttonContainer}>
         <TouchableOpacity
           onPress={() => navigation.push("CreateFeedback", book)}
           style={style.getStartedButton}
         >
-          <Text style={style.buttonText}>Add Feedback</Text>
-          <Icon name="edit" size={27} color={COLORS.white} />
+          <Text style={style.buttonText}>Feedback</Text>
+          <Icon name="add" size={27} color={COLORS.white} />
         </TouchableOpacity>
       </View>
-
+      </ImageBackground>
       <ScrollView>
         {feedbacks.map((post) => (
           <TouchableOpacity key={post._id} style={style.post}>
@@ -224,9 +221,10 @@ const BookFeedback = ({ navigation, route }) => {
                   }}
                 >
                   <TouchableOpacity
-                  onPress={() => {
-                    navigation.push("UpdateFeedback",post);
-                  }}>
+                    onPress={() => {
+                      navigation.push("UpdateFeedback", post);
+                    }}
+                  >
                     <Icon name="edit" size={35} color={COLORS.blue} />
                   </TouchableOpacity>
                   <View
@@ -344,8 +342,8 @@ const style = StyleSheet.create({
     marginLeft: 5,
   },
   getStartedButton: {
-    width: responsiveWidth(55),
-    height: responsiveHeight(6),
+    width: responsiveWidth(30),
+    height: responsiveHeight(5),
     backgroundColor: COLORS.green,
     borderRadius: 15,
     marginRight: "2%",
@@ -353,7 +351,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginTop: responsiveHeight(-5),
+    marginTop: responsiveHeight(13),
     maxWidth: 200,
   },
 

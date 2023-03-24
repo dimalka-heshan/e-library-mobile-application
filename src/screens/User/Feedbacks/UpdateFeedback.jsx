@@ -1,67 +1,61 @@
 import {
-    StyleSheet,
-    Text,
-    View,
-    SafeAreaView,
-    TouchableOpacity,
-    Alert,
-  } from "react-native";
-  import React, { useState } from "react";
-  import COLORS from "../../../constants/color";
-  import Icon from "react-native-vector-icons/MaterialIcons";
-  import { MaterialIcons } from "@expo/vector-icons";
-  import {
-    responsiveHeight,
-    responsiveWidth,
-  } from "react-native-responsive-dimensions";
-  import { TextInput } from "react-native";
-  import axios from "axios";
-  import AsyncStorage from "@react-native-async-storage/async-storage";
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import React, { useState } from "react";
+import COLORS from "../../../constants/color";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { MaterialIcons } from "@expo/vector-icons";
+import {
+  responsiveHeight,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
+import { TextInput } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UpdateFeedback = ({ navigation, route }) => {
-    const rate = route.params;
-    const [starRating, setStarRating] = useState(rate.rating);
-    const [feedBack, setFeedBack] = useState(rate.feedback);
-    const [token, setToken] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [validationErrors, setValidationErrors] = useState({}); 
-    
+  const rate = route.params;
+  const [starRating, setStarRating] = useState(rate.rating);
+  const [feedBack, setFeedBack] = useState(rate.feedback);
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
 
-    AsyncStorage.getItem("token").then((token) => {
-        setToken(token);
-      });
-    console.log(rate._id);
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
+  // console.log(rate._id);
 
-
-      //update book
+  //update book
   const updateFeedbackuser = async () => {
-   
-    
     const body = {
-        rating: starRating,
+      rating: starRating,
       feedback: feedBack,
-    }
-    console.log(body);
-  
+    };
+    // console.log(body);
+
     try {
       await axios
         .patch(`/feedback/updateFeedback/${rate._id}`, body, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         })
         .then((res) => {
-          
           Alert.alert("Success", "Feedback Updated Successfully", [
             {
               text: "OK",
-              onPress: () => navigation.push("BookFeedback",rate.book),
+              onPress: () => navigation.push("BookFeedback", rate.book),
             },
           ]);
         })
         .catch((err) => {
-          
           if (err.response.status == 400) {
             if (err.response.data.message != "Data validation error!") {
               setError(err.response.data.message);
@@ -161,16 +155,16 @@ const UpdateFeedback = ({ navigation, route }) => {
 
       <View style={styles.textInputContainer}>
         <View style={styles.loginContainer}>
-        <TextInput
-                  style={styles.textArea}
-                  placeholder="Enter your Feedback"
-                  multiline={true}
-                  numberOfLines={20}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  value={feedBack}
-                  onChangeText={(text) => setFeedBack(text)}
-                />
+          <TextInput
+            style={styles.textArea}
+            placeholder="Enter your Feedback"
+            multiline={true}
+            numberOfLines={20}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            value={feedBack}
+            onChangeText={(text) => setFeedBack(text)}
+          />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.submitButton}
@@ -179,95 +173,93 @@ const UpdateFeedback = ({ navigation, route }) => {
               <Text style={styles.submitButtonText}>Update</Text>
             </TouchableOpacity>
           </View>
-          
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default UpdateFeedback
+export default UpdateFeedback;
 
 const styles = StyleSheet.create({
-    header: {
-        paddingHorizontal: "5%",
-        marginTop: "10%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-      },
-    
-      container: {
-        flex: 2,
-        // height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        marginTop: "5%",
-      },
-      heading: {
-        fontSize: 25,
-        fontWeight: "bold",
-        marginBottom: 15,
-      },
-      stars: {
-        display: "flex",
-        flexDirection: "row",
-      },
-      starUnselected: {
-        color: "#aaa",
-      },
-    
-      starSelected: {
-        color: "#ffb300",
-      },
-      textInputContainer: {
-        flex: 4,
-        width: "80%",
-        height: "50%",
-        alignSelf: "center",
-        marginTop: responsiveHeight(-5),
-        
-      },
-      loginContainer: {
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-      },
-      textInput: {
-        width: "102%",
-        marginTop: responsiveHeight(1),
-        height: 150,
-        backgroundColor: "#99FFFF",
-        borderRadius: 10,
-        paddingLeft: 10,
-        marginBottom: "15%",
-      },
-      submitButton: {
-        width: 220,
-        height: "30%",
-        backgroundColor: COLORS.green,
-        borderRadius: 10,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 3,
-        borderColor: "white",
-        minHeight: 50,
-        marginBottom: responsiveHeight(5),
-      },
-    
-      submitButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 27,
-      },
-      textArea: {
-        width: "100%",
-        height: 200,
-        backgroundColor: "white",
-        padding: 10,
-        marginBottom: "5%",
-        textAlignVertical: "top",
-    
-        borderRadius: 10,
-      },
-})
+  header: {
+    paddingHorizontal: "5%",
+    marginTop: "10%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  container: {
+    flex: 2,
+    // height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    marginTop: "5%",
+  },
+  heading: {
+    fontSize: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  stars: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  starUnselected: {
+    color: "#aaa",
+  },
+
+  starSelected: {
+    color: "#ffb300",
+  },
+  textInputContainer: {
+    flex: 4,
+    width: "80%",
+    height: "50%",
+    alignSelf: "center",
+    marginTop: responsiveHeight(-5),
+  },
+  loginContainer: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+  },
+  textInput: {
+    width: "102%",
+    marginTop: responsiveHeight(1),
+    height: 150,
+    backgroundColor: "#99FFFF",
+    borderRadius: 10,
+    paddingLeft: 10,
+    marginBottom: "15%",
+  },
+  submitButton: {
+    width: 220,
+    height: "30%",
+    backgroundColor: COLORS.green,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: "white",
+    minHeight: 50,
+    marginBottom: responsiveHeight(5),
+  },
+
+  submitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 27,
+  },
+  textArea: {
+    width: "100%",
+    height: 200,
+    backgroundColor: "white",
+    padding: 10,
+    marginBottom: "5%",
+    textAlignVertical: "top",
+
+    borderRadius: 10,
+  },
+});
