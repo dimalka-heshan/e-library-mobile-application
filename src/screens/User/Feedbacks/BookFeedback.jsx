@@ -13,6 +13,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import React, { useRef, useState, useEffect } from "react";
 import COLORS from "../../../constants/color";
+import { MultipleSelectList, SelectList ,} from 'react-native-dropdown-select-list'
 import {
   responsiveHeight,
   responsiveWidth,
@@ -86,6 +87,7 @@ const BookFeedback = ({ navigation, route }) => {
   const [createdAt, setCreatedAt] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [rating, setRating] = useState("");
+  const [selected, setSelected] = React.useState([]);
   // const [bookID, setBookID] = useState(route.params);
 
   const book = route.params;
@@ -94,6 +96,15 @@ const BookFeedback = ({ navigation, route }) => {
     setToken(token);
   });
   const [user, setUser] = React.useState("");
+
+  const filterdata = [
+    {key:'1', value:'1 Star',},
+    {key:'2', value:'2 Stars'},
+    {key:'3', value:'3 Stars'},
+    {key:'4', value:'4 Stars'},
+    {key:'5', value:'5 Stars'},
+    
+]
 
   const getUserDetails = () => {
     setLoading(true);
@@ -190,6 +201,19 @@ const BookFeedback = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
       </ImageBackground>
+
+      <View style={style.searchContainer}>
+      <Text style={style.filtertext}>Filter Feedbacks by Stars:   </Text>
+      
+      <MultipleSelectList 
+        setSelected={(val) => setSelected(val)} 
+        data={filterdata} 
+        save="value"
+        onSelect={() => alert(selected)} 
+        label="Categories"
+    /></View>
+    
+     
       {feedbacks.length > 0 ? (
             <ScrollView>
             {feedbacks.map((post) => (
@@ -383,6 +407,22 @@ const style = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 19,
+  },
+  filtertext: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 19,
+    marginBottom: 7,
+    marginTop:10,
+    
+  },
+  searchContainer: {
+    alignItems: "flex-start",
+    marginLeft: 19,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom:15
+    
   },
 
   editButton: {
