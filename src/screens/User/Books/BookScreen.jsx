@@ -140,7 +140,7 @@ const BookScreen = ({ navigation, route }) => {
             }}
           >
             {book.bookCategories ? (
-              <Text>Book Categories: {book.bookCategories.join(", ")}</Text>
+              <Text>Book Categories : {book.bookCategories.join(", ")}</Text>
             ) : (
               ""
             )}

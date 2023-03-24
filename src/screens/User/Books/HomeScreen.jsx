@@ -111,6 +111,7 @@ export default function HomeScreen({ navigation }) {
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           {categories.map((item, index) => (
             <View
+              key={index}
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -181,7 +182,7 @@ export default function HomeScreen({ navigation }) {
               marginTop: 10,
             }}
           >
-            {truncate(book.bookName, 49)}
+            {truncate(book.bookName, 40)}
           </Text>
           <View
             style={{
@@ -338,6 +339,6 @@ const style = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
-    paddingBottom: 100,
+    marginBottom: 80,
   },
 });
