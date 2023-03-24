@@ -29,6 +29,7 @@ import UpdateBookScreen from "../screens/Admin/Books/UpdateBookScreen";
 import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
 import AddBlog from "../screens/Admin/Blogs/AddBlog";
 import EditBlog from "../screens/Admin/Blogs/EditBlog";
+import OneBookScreen from "../screens/Admin/Books/OneBookScreen";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -49,6 +50,14 @@ function BooksStackScreen() {
       <BooksStack.Screen
         name="AddBookScreen"
         component={AddBookScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BooksStack.Screen
+        name="OneBookScreen"
+        component={OneBookScreen}
         options={{
           headerShown: false,
         }}
@@ -314,7 +323,6 @@ export default function AdminTabs() {
           ),
         }}
         listeners={({ navigation, route }) => ({
-          // Onpress Update....
           tabPress: (e) => {
             Animated.spring(tabOffsetValue, {
               toValue: getWidth() * 3.88,

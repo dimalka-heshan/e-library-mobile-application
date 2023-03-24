@@ -11,7 +11,7 @@ const CustomLoading = () => {
         source={require("../../assets/loading.json")}
         style={{ width: 100, height: 100 }}
       /> */}
-      <ActivityIndicator size="large" color={COLORS.blue} />
+      <ActivityIndicator size="large" />
     </View>
   );
 };
