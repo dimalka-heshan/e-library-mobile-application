@@ -32,7 +32,7 @@ const BlogContent = ({ navigation, route }) => {
       >
         <View style={style.header}>
           <Icon
-            name="arrow-back-ios-ios"
+            name="arrow-back-ios"
             size={28}
             color={COLORS.white}
             onPress={navigation.goBack}

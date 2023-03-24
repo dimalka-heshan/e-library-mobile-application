@@ -147,7 +147,7 @@ const AddBlog = ({ navigation }) => {
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
       <View style={style.header}>
         <Icon
-          name="arrow-back-ios-ios"
+          name="arrow-back-ios"
           size={28}
           color={COLORS.white}
           onPress={navigation.goBack}
