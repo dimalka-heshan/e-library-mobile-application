@@ -1,62 +1,59 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import React, { useState } from "react";
 import COLORS from "../../../constants/color";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import {
-    responsiveHeight,
-    responsiveWidth,
-  } from "react-native-responsive-dimensions";
-import { TextInput } from 'react-native';
-import axios from 'axios';
-  
+  responsiveHeight,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
+import { TextInput } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const CreateFeedback = ({ navigation, route }) => {
+  const book = route.params;
+  const [starRating, setStarRating] = useState(null);
+  const [loading, setLoading] = React.useState(false);
+  const [feedBack, setFeedBack] = useState("");
+  const [error, setError] = useState("");
+  const [token, setToken] = useState("");
 
-const CreateFeedback = ({navigation}) => {
-  const body = new FormData();
-  const { bookID } = route.params;
-    const [starRating, setStarRating] = useState(null);
-    const [loading, setLoading] = React.useState(false);
-    const [error, setError] = useState("");
+  AsyncStorage.getItem("token").then((token) => {
+    setToken(token);
+  });
 
+  const PublishFeedback = async () => {
+    const newFeedback = {
+      rating: starRating,
+      feedback: feedBack,
+    };
 
-  // const publishFeedback = async () => {
-  //   setLoading(true);
-  //   setError("");
-
-  //   const body = new FormData();
-  //   body.append("feedback", feedback);
-  //   body.append("rating", rating);
-
-  //   await axios
-  //     .post("feedback/createFeedback/${bookID}", body, {
-  //       headers: {
-  //         "Contest-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then((res) => {
-  //       setLoading(false);
-  //       Alert.alert("Success", "Feedback Published Successfully", [
-  //         {
-  //           text: "OK",
-  //           onPress: () => navigation.push("BookFeedback"),
-  //         },
-  //       ]);
-  //     })
-  //     .catch((err) => {
-  //       setLoading(false);
-  //       if (err.response.status == 400) {
-  //         if (err.response.data.message != "Data validation error!") {
-  //           setError(err.response.data.message);
-  //         } else {
-  //           setValidationErrors(err.response.data.data);
-  //         }
-  //       } else {
-  //         setError("Something went wrong!");
-  //       }
-  //     });
-  // };
-
+    await axios
+      .post(`/feedback/createFeedback/${book}`, newFeedback, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        Alert.alert("success", "Feedback created successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.push("BookFeedback", book),
+          },
+        ]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <SafeAreaView
@@ -140,11 +137,15 @@ const CreateFeedback = ({navigation}) => {
 
       <View style={styles.textInputContainer}>
         <View style={styles.loginContainer}>
-          <TextInput style={styles.textInput} placeholder="Your Feedback" />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Your Feedback"
+            onChangeText={(text) => setFeedBack(text)}
+          />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={publishFeedback}
+              onPress={PublishFeedback}
             >
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
@@ -153,83 +154,81 @@ const CreateFeedback = ({navigation}) => {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 export default CreateFeedback;
 
-
 const styles = StyleSheet.create({
-    header: {
-        paddingHorizontal: "5%",
-        marginTop: "10%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-      },
+  header: {
+    paddingHorizontal: "5%",
+    marginTop: "10%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 
-      container: {
-        flex: 2,
-        // height: 50,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-        marginTop:"5%"
-      },
-      heading: {
-        fontSize: 25,
-        fontWeight: 'bold',
-        marginBottom: 15,
-      },
-      stars: {
-        display: 'flex',
-        flexDirection: 'row',
-      },
-      starUnselected: {
-        color: '#aaa',
-      },
+  container: {
+    flex: 2,
+    // height: 50,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    marginTop: "5%",
+  },
+  heading: {
+    fontSize: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  stars: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  starUnselected: {
+    color: "#aaa",
+  },
 
-      starSelected: {
-        color: '#ffb300',
-      },
-      textInputContainer: {
-        flex: 4,
-        width: "80%",
-        height: "50%",
-        alignSelf: "center",
-        marginTop: responsiveHeight(-5),
-        backgroundColor: "white"
-      },
-      loginContainer: {
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-      },
-      textInput: {
-        width: "102%",
-        marginTop: responsiveHeight(1),
-        height: 150,
-        backgroundColor: "#99FFFF",
-        borderRadius: 10,
-        paddingLeft: 10,
-        marginBottom: "15%",
-      },
-      submitButton: {
-        width: 220,
-        height: "30%",
-        backgroundColor: COLORS.green,
-        borderRadius: 10,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 3,
-        borderColor: "white",
-        minHeight: 50,
-        marginBottom: responsiveHeight(5),
-      },
+  starSelected: {
+    color: "#ffb300",
+  },
+  textInputContainer: {
+    flex: 4,
+    width: "80%",
+    height: "50%",
+    alignSelf: "center",
+    marginTop: responsiveHeight(-5),
+    backgroundColor: "white",
+  },
+  loginContainer: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+  },
+  textInput: {
+    width: "102%",
+    marginTop: responsiveHeight(1),
+    height: 150,
+    backgroundColor: "#99FFFF",
+    borderRadius: 10,
+    paddingLeft: 10,
+    marginBottom: "15%",
+  },
+  submitButton: {
+    width: 220,
+    height: "30%",
+    backgroundColor: COLORS.green,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: "white",
+    minHeight: 50,
+    marginBottom: responsiveHeight(5),
+  },
 
-      submitButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 27
-      },
-    
-})
+  submitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 27,
+  },
+});
