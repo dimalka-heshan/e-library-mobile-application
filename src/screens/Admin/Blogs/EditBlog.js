@@ -20,7 +20,7 @@ const EditBlog = ({ navigation }) => {
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <View style={style.header}>
-          <Icon name="arrow-back-ios" size={28} color={COLORS.black} />
+          <Icon name="arrow-back-ios-ios" size={28} color={COLORS.black} />
         </View>
       </TouchableOpacity>
       <View

@@ -28,7 +28,11 @@ const OneBookScreen = ({ navigation, route }) => {
       }}
     >
       <View style={style.header}>
-        <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
+        <Icon
+          name="arrow-back-ios"
+          size={28}
+          onPress={() => navigation.goBack()}
+        />
       </View>
 
       <View style={style.imageContainer}>

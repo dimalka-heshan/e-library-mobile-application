@@ -48,7 +48,6 @@ export default function Profile({ navigation }) {
       })
       .catch((err) => {
         setLoading(false);
-        console.log(JSON.stringify(err));
       });
   };
 
@@ -74,7 +73,7 @@ export default function Profile({ navigation }) {
         >
           <View style={styles.header}>
             <Icon
-              name="arrow-back"
+              name="arrow-back-ios"
               size={28}
               color={COLORS.white}
               onPress={() => navigation.goBack()}
@@ -171,6 +170,7 @@ export default function Profile({ navigation }) {
                   Log Out
                 </Text>
               </TouchableOpacity>
+              <View style={{ paddingBottom: 100 }}></View>
             </ScrollView>
           </View>
         </ImageBackground>
