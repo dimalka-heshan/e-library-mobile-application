@@ -16,7 +16,7 @@ import {
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 
-const BookScreen = ({ navigation, route }) => {
+const OneBookScreen = ({ navigation, route }) => {
   const [book, setBook] = useState(route.params);
 
   return (
@@ -73,7 +73,6 @@ const BookScreen = ({ navigation, route }) => {
               }}
             >
               <Text
-              
                 style={{
                   fontSize: 15,
                   fontWeight: "bold",
@@ -83,18 +82,6 @@ const BookScreen = ({ navigation, route }) => {
               >
                 {book.bookAuthor}
               </Text>
-              <TouchableOpacity onPress={() => navigation.push("BookFeedback",book)}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "bold",
-                    color: COLORS.blue,
-                    marginTop: 1,
-                  }}
-                >
-                  {"View Feedback >>"}
-                </Text>
-              </TouchableOpacity>
             </View>
           </View>
           <Text
@@ -147,7 +134,7 @@ const BookScreen = ({ navigation, route }) => {
   );
 };
 
-export default BookScreen;
+export default OneBookScreen;
 
 const style = StyleSheet.create({
   header: {
@@ -159,7 +146,7 @@ const style = StyleSheet.create({
 
   imageContainer: {
     width: "100%",
-    height: "37%",
+    height: "35%",
     backgroundColor: COLORS.white,
     justifyContent: "center",
   },
