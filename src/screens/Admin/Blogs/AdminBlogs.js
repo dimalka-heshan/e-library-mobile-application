@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  TouchableHighlight,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";

@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../../constants/color";
@@ -29,42 +30,49 @@ const BlogScreen = ({ navigation }) => {
       name: "History",
       catImg:
         "https://upload.wikimedia.org/wikipedia/commons/2/24/1686_Mallet_Map_of_Ceylon_or_Sri_Lanka_%28Taprobane%29_-_Geographicus_-_Taprobane-mallet-1686.jpg",
+      link: "https://feedly.com/i/top/history-blogs",
     },
     {
       id: 2,
       name: "Culture",
       catImg:
         "https://strategicpsychology.com.au/wp-content/uploads/Multicultural-character.jpg",
+      link: "https://blog.feedspot.com/culture_blogs/",
     },
     {
       id: 3,
       name: "Nature",
       catImg:
         "https://images.news18.com/ibnlive/uploads/2021/07/1627448017_world-nature-conservation-day.png",
+      link: "https://blog.feedspot.com/nature_blogs/",
     },
     {
       id: 4,
       name: "Adventure",
       catImg:
         "https://warnercnr.colostate.edu/wp-content/uploads/sites/2/2017/04/shutterstock_428626417-1024x683.jpg",
+      link: "https://adventureblog.net/blog",
     },
     {
       id: 5,
       name: "Religion",
       catImg:
         "https://www.jobs.ca/content/uploads/2018/03/religion-and-business.jpg",
+      link: "https://blog.feedspot.com/religion_blogs/",
     },
     {
       id: 6,
       name: "Food",
       catImg:
         "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
+      link: "https://blog.feedspot.com/food_blogs/",
     },
     {
       id: 7,
       name: "Wildlife",
       catImg:
         "https://designgrapher.com/wp-content/uploads/2015/10/types-of-photography1.jpg",
+      link: "https://blog.feedspot.com/wildlife_blogs/",
     },
   ];
 
@@ -180,6 +188,9 @@ const BlogScreen = ({ navigation }) => {
                 }}
               >
                 <Image
+                  key={index}
+                  //Open the category link in the browser without leaving the app
+
                   style={
                     style.iconContainer && {
                       width: 50,
@@ -201,6 +212,9 @@ const BlogScreen = ({ navigation }) => {
                     marginTop: 5,
                     textAlign: "center",
                     letterSpacing: 1,
+                  }}
+                  onPress={() => {
+                    Linking.openURL(category.link);
                   }}
                 >
                   {category.name}

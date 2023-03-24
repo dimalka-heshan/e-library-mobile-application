@@ -198,7 +198,14 @@ const AdminBlogContent = ({ navigation, route }) => {
             >
               <Text style={{ fontWeight: "bold" }}>References:</Text>
               <View>
-                <Text style={{ color: "blue" }}>{allBlogs.blogReference}</Text>
+                <Text
+                  style={{ color: "blue" }}
+                  onPress={() => {
+                    Linking.openURL(allBlogs.blogReference);
+                  }}
+                >
+                  {allBlogs.blogReference}
+                </Text>
               </View>
             </View>
           ) : null}
