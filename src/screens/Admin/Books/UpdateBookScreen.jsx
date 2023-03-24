@@ -169,7 +169,7 @@ const UpdateBookScreen = ({ navigation, route }) => {
       >
         <View style={styles.arrowHeader}>
           <Icon
-            name="arrow-back"
+            name="arrow-back-ios"
             size={28}
             onPress={() => navigation.goBack()}
           />

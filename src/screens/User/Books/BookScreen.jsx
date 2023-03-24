@@ -28,7 +28,11 @@ const BookScreen = ({ navigation, route }) => {
       }}
     >
       <View style={style.header}>
-        <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
+        <Icon
+          name="arrow-back-ios"
+          size={28}
+          onPress={() => navigation.goBack()}
+        />
       </View>
 
       <View style={style.imageContainer}>
@@ -70,6 +74,7 @@ const BookScreen = ({ navigation, route }) => {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
+                marginTop: 2,
               }}
             >
               <Text

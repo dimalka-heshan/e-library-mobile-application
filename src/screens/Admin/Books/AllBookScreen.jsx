@@ -166,6 +166,7 @@ const AllBookScreen = ({ navigation }) => {
                 onPress={() => {
                   navigation.push("OneBookScreen", book);
                 }}
+                key={book._id}
               >
                 <View key={book._id} style={styles.bookContainer}>
                   <Image
