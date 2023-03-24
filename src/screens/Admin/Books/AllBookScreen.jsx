@@ -8,176 +8,280 @@ import {
   TextInput,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   responsiveHeight,
   responsiveWidth,
 } from "react-native-responsive-dimensions";
 import COLORS from "../../../constants/color";
-import TempBooks from "../../../constants/book";
 import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 import truncate from "truncate";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const AllBookScreen = ({ navigation }) => {
-  return (
-    <SafeAreaView
-      style={{
-        marginBottom: 80,
-      }}
-    >
-      <View
-        style={{
-          width: "80%",
-          alignSelf: "center",
-          marginTop: "8%",
-          height: "8%",
-        }}
-      >
-        <Text style={styles.header}>Books</Text>
-      </View>
+  const [loading, setLoading] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [token, setToken] = useState("");
 
-      <View
+  AsyncStorage.getItem("token").then((value) => {
+    setToken(value);
+  });
+
+  const GetBooks = async () => {
+    setLoading(true);
+    await axios
+      .get("/book/getAllBooks/?category=")
+      .then((res) => {
+        setBooks(res.data.filteredBooks);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
+  const filterData = (books, searchKey) => {
+    const result = books.filter(
+      (book) =>
+        book.bookName.toLowerCase().includes(searchKey) ||
+        book.bookAuthor.toLowerCase().includes(searchKey)
+    );
+    setBooks(result);
+  };
+
+  const onSearch = async (e) => {
+    await axios
+      .get(`/book/getAllBooks/?category=`)
+      .then((res) => {
+        filterData(res.data.filteredBooks, e.toLowerCase());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  //delete book
+  const deleteBook = async (id) => {
+    setLoading(true);
+    await axios
+      .delete(`/book/deleteBook/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setLoading(false);
+        Alert.alert("Success", "Book deleted successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.push("AllBookScreen"),
+          },
+        ]);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    GetBooks();
+  }, []);
+
+  return (
+    <>
+      <SafeAreaView
         style={{
-          width: "100%",
-          height: "8%",
-          paddingLeft: "2.5%",
-          paddingRight: "2.5%",
+          marginBottom: 80,
         }}
       >
         <View
           style={{
-            flexDirection: "row",
-            padding: "3%",
-            alignItems: "center",
-            justifyContent: "space-around",
+            width: "80%",
+            alignSelf: "center",
+            marginTop: "8%",
+            height: "8%",
           }}
         >
-          <View style={styles.searchContainer}>
-            <Icon name="search" size={25} style={{ marginLeft: 20 }} />
-            <TextInput placeholder="Search" style={styles.input} />
-          </View>
+          <Text style={styles.header}>Books</Text>
+        </View>
 
-          <TouchableOpacity
-            style={styles.addIcon}
-            onPress={() => navigation.push("AddBookScreen")}
+        <View
+          style={{
+            width: "100%",
+            height: "8%",
+            paddingLeft: "2.5%",
+            paddingRight: "2.5%",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              padding: "3%",
+              alignItems: "center",
+              justifyContent: "space-around",
+            }}
           >
-            <Icon
-              name="add"
-              size={28}
-              style={{
-                color: COLORS.white,
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView
-        style={{
-          width: "100%",
-          height: "100%",
-          marginTop: "5%",
-        }}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.container}>
-          {TempBooks.map((book) => (
-            <View key={book.id} style={styles.bookContainer}>
-              <Image source={book.img} style={styles.bookImage} />
-              <View
-                style={{
-                  width: "100%",
-                  marginTop: "10%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: "5%",
-                  minHeight: 75,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    letterSpacing: 1,
-                    textAlign: "center",
-                    lineHeight: 20,
-                  }}
-                >
-                  {truncate(book.name, 20)}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 11,
-                    fontWeight: "bold",
-                    color: "gray",
-                    marginTop: 5,
-                  }}
-                >
-                  {book.price}
-                </Text>
-              </View>
-              <View
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  flexDirection: "row",
-                  alignContent: "center",
-                  justifyContent: "space-evenly",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.push("UpdateBookScreen");
-                  }}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: COLORS.grey,
-                    position: "relative",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon
-                    name="edit"
-                    size={18}
-                    color={COLORS.primary}
-                    style={{
-                      position: "absolute",
-                    }}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: COLORS.grey,
-                    position: "relative",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon
-                    name="delete"
-                    size={20}
-                    color="red"
-                    style={{
-                      marginLeft: "5%",
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.searchContainer}>
+              <Icon name="search" size={25} style={{ marginLeft: 20 }} />
+              <TextInput
+                placeholder="Search"
+                style={styles.input}
+                onChangeText={(text) => onSearch(text)}
+              />
             </View>
-          ))}
+
+            <TouchableOpacity
+              style={styles.addIcon}
+              onPress={() => navigation.push("AddBookScreen")}
+            >
+              <Icon
+                name="add"
+                size={28}
+                style={{
+                  color: COLORS.white,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <ScrollView
+          style={{
+            width: "100%",
+            height: "100%",
+            marginTop: "5%",
+          }}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            {books.map((book) => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.push("OneBookScreen", book);
+                }}
+              >
+                <View key={book._id} style={styles.bookContainer}>
+                  <Image
+                    source={{ uri: book.bookBanner }}
+                    style={styles.bookImage}
+                  />
+                  <View
+                    style={{
+                      width: "100%",
+                      marginTop: "10%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "5%",
+                      minHeight: 75,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        letterSpacing: 1,
+                        textAlign: "center",
+                        lineHeight: 20,
+                      }}
+                    >
+                      {truncate(book.bookName, 25)}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        fontWeight: "bold",
+                        color: "gray",
+                        marginTop: 5,
+                      }}
+                    >
+                      {truncate(book.bookAuthor, 20)}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      flexDirection: "row",
+                      alignContent: "center",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.push("UpdateBookScreen", book);
+                      }}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 10,
+                        backgroundColor: COLORS.grey,
+                        position: "relative",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Icon
+                        name="edit"
+                        size={18}
+                        color={COLORS.primary}
+                        style={{
+                          position: "absolute",
+                        }}
+                      />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.alert(
+                          "Delete Book",
+                          "Are you sure you want to delete this book?",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => deleteBook(book._id),
+                            },
+                            {
+                              text: "Cancel",
+                              onPress: () => console.log("Cancel Pressed"),
+                            },
+                          ]
+                        );
+                      }}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 10,
+                        backgroundColor: COLORS.grey,
+                        position: "relative",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Icon
+                        name="delete"
+                        size={20}
+                        color="red"
+                        style={{
+                          marginLeft: "5%",
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      {loading ? <CustomLoading /> : ""}
+    </>
   );
 };
 
@@ -211,9 +315,9 @@ const styles = StyleSheet.create({
 
   bookContainer: {
     width: responsiveWidth(40),
-    height: responsiveHeight(36),
+    height: responsiveHeight(32),
     backgroundColor: COLORS.white,
-    marginBottom: "5%",
+    marginBottom: "2%",
     borderRadius: 10,
     flexDirection: "column",
   },
@@ -222,7 +326,6 @@ const styles = StyleSheet.create({
     width: "80%",
     height: "50%",
     top: "5%",
-    resizeMode: "contain",
     borderRadius: 15,
     alignContent: "center",
     alignSelf: "center",
