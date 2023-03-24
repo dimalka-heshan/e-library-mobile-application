@@ -20,12 +20,15 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 
 import Profile from "../screens/Admin/Profile/Profile";
-import Blogs from "../screens/Admin/Blogs/Blogs";
+import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
 import Advertisement from "../screens/Admin/Advertisements/Advertisements";
 
 import AddBookScreen from "../screens/Admin/Books/AddBookScreen";
 import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
 import UpdateBookScreen from "../screens/Admin/Books/UpdateBookScreen";
+import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
+import AddBlog from "../screens/Admin/Blogs/AddBlog";
+import EditBlog from "../screens/Admin/Blogs/EditBlog";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -94,8 +97,32 @@ function BlogsStackScreen() {
   return (
     <BlogsStack.Navigator>
       <BlogsStack.Screen
-        name="Blogs"
-        component={Blogs}
+        name="AdminBlogs"
+        component={AdminBlogs}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AdminBlogContent"
+        component={AdminBlogContent}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AddBlog"
+        component={AddBlog}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="EditBlog"
+        component={EditBlog}
         options={{
           headerShown: false,
         }}
@@ -204,7 +231,7 @@ export default function AdminTabs() {
         // Extra Tab Screen For Action Button..
       }
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name={"ActionButton"}
         component={AdvertisementStackScreen}
         options={{
@@ -233,7 +260,7 @@ export default function AdminTabs() {
             </TouchableOpacity>
           ),
         }}
-      ></Tab.Screen>
+      ></Tab.Screen> */}
 
       <Tab.Screen
         name={"BlogsStack"}

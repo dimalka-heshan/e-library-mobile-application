@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -20,18 +21,23 @@ import bookCategory from "../../../constants/bookCategory";
 import { MultiSelect } from "react-native-element-dropdown";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 const AddBook = ({ navigation }) => {
   const [bookName, setBookName] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookDescription, setBookDescription] = useState("");
-  const [bookImage, setBookImage] = useState(null);
+  const [bookImage, setBookImage] = useState({});
   const [imageUploadStatus, setImageUploadStatus] = useState(
     "Choose Book Picture"
   );
-  const [eBookFile, setEBookFile] = useState([]);
+  const [eBookFile, setEBookFile] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [pdfUploadStatus, setPdfUploadStatus] = useState("Choose E-Book File");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState("");
+  const [token, setToken] = useState("");
 
   //For Multiple selection
   const renderItem = (item) => {
@@ -51,10 +57,14 @@ const AddBook = ({ navigation }) => {
       });
 
       if (result.type === "success") {
-        setEBookFile(result);
+        setEBookFile({
+          uri: result.uri,
+          mimeType: "application/pdf",
+          name: "file.pdf",
+        });
         setPdfUploadStatus("E-Book File Uploaded");
       } else {
-        setEBookFile([]);
+        setEBookFile({});
         setPdfUploadStatus("Choose E-Book File");
       }
     } catch (e) {
@@ -62,21 +72,79 @@ const AddBook = ({ navigation }) => {
     }
   };
 
+  AsyncStorage.getItem("token").then((value) => {
+    setToken(value);
+  });
+
   //for Image upload
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 12],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setBookImage(result);
+      setBookImage({
+        uri: result.assets[0].uri,
+        mimeType: "image/jpeg",
+        name: "image.jpg",
+      });
       setImageUploadStatus("Book Picture Uploaded");
     } else {
       setBookImage(null);
       setImageUploadStatus("Choose Book Picture");
+    }
+  };
+
+  //Add book handler
+  const handleAddBook = async () => {
+    const body = new FormData();
+    body.append("bookName", bookName);
+    body.append("bookAuthor", bookAuthor);
+    body.append("bookDescription", bookDescription);
+    body.append("files", bookImage);
+    body.append("files", eBookFile);
+
+    //for multiple selection
+    if (selectedItems.length > 0) {
+      for (var i = 0; i < selectedItems.length; i++) {
+        body.append(`bookCategories[${i}]`, selectedItems[i]);
+      }
+    }
+    try {
+      await axios
+        .post("/book/createBook", body, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          Alert.alert("Success", "Book Added Successfully!", [
+            {
+              text: "OK",
+              onPress: () => navigation.push("AllBookScreen"),
+            },
+          ]);
+        })
+        .catch((err) => {
+          console.log(JSON.stringify(err));
+
+          if (err.response.status == 400) {
+            if (err.response.data.message != "Data validation error!") {
+              setError(err.response.data.message);
+            } else {
+              setError("");
+              setValidationErrors(err.response.data.data);
+            }
+          } else {
+            setError("Something went wrong!");
+          }
+        });
+    } catch (e) {
+      setError("Something went wrong!");
     }
   };
 
@@ -96,6 +164,8 @@ const AddBook = ({ navigation }) => {
         <Text style={styles.header}>Add Book</Text>
       </View>
       <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         style={{
           width: "100%",
           height: "100%",
@@ -108,10 +178,28 @@ const AddBook = ({ navigation }) => {
                 placeholder="Book Name"
                 onChangeText={setBookName}
               />
+
+              {validationErrors.bookName ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.bookName}
+                </Text>
+              ) : (
+                ""
+              )}
+
               <CustomTextInput
                 placeholder="Book Author"
                 onChangeText={setBookAuthor}
               />
+
+              {validationErrors.bookAuthor ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.bookAuthor}
+                </Text>
+              ) : (
+                ""
+              )}
+
               <MultiSelect
                 style={styles.textInput}
                 placeholderStyle={{
@@ -149,6 +237,13 @@ const AddBook = ({ navigation }) => {
                   </TouchableOpacity>
                 )}
               />
+              {validationErrors.bookCategories ? (
+                <Text style={styles.errorTextSelection}>
+                  {validationErrors.bookCategories}
+                </Text>
+              ) : (
+                ""
+              )}
               <TextInput
                 style={styles.textArea}
                 placeholder="Book Description"
@@ -156,6 +251,15 @@ const AddBook = ({ navigation }) => {
                 numberOfLines={20}
                 onChangeText={(text) => setBookDescription(text)}
               />
+
+              {validationErrors.bookDescription ? (
+                <Text style={styles.errorText}>
+                  {validationErrors.bookDescription}
+                </Text>
+              ) : (
+                ""
+              )}
+
               <View style={styles.imageUploadField}>
                 <TextInput
                   style={styles.ImageTextInput}
@@ -186,8 +290,36 @@ const AddBook = ({ navigation }) => {
                   <Text style={styles.uploadTxt}>Upload</Text>
                 </TouchableOpacity>
               </View>
+              {error ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "red",
+                    borderRadius: 10,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {error}
+                  </Text>
+                </View>
+              ) : (
+                ""
+              )}
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.loginButton}>
+                <TouchableOpacity
+                  onPress={handleAddBook}
+                  style={styles.loginButton}
+                >
                   <Text style={styles.loginButtonText}>Add Book</Text>
                 </TouchableOpacity>
               </View>
@@ -341,5 +473,24 @@ const styles = StyleSheet.create({
   uploadTxt: {
     color: "black",
     fontWeight: "bold",
+  },
+
+  errorText: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-4%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
+  },
+  errorTextSelection: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-2%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
   },
 });

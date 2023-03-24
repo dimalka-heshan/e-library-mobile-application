@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
 } from "react-native";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
@@ -29,9 +30,14 @@ import createFeedback from "../screens/User/Feedbacks/CreateFeedback"
 import Profile from "../screens/User/Profile/Profile";
 
 import Blogs from "../screens/User/Blogs/Blogs";
+import BlogContent from "../screens/User/Blogs/BlogContent";
 
 import Advertisement from "../screens/User/Advertisements/Advertisements";
 import AdvertisementDetails from "../screens/User/Advertisements/AdvertisementDetails";
+import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
+import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
+import AddBlog from "../screens/Admin/Blogs/AddBlog";
+import EditBlog from "../screens/Admin/Blogs/EditBlog";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -118,6 +124,14 @@ function BlogsStackScreen() {
       <BlogsStack.Screen
         name="Blogs"
         component={Blogs}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="BlogContent"
+        component={BlogContent}
         options={{
           headerShown: false,
         }}
