@@ -19,7 +19,10 @@ import {
   responsiveFontSize,
 } from "react-native-responsive-dimensions";
 import axios from "axios";
+import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LottieView from "lottie-react-native";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 
 const book = {
   id: 1,
@@ -162,30 +165,20 @@ const BookFeedback = ({ navigation, route }) => {
   // console.log(feedbacks);
 
   return (
+    <>
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
       <ImageBackground
-        style={{marginBottom: 20}}
-        source={require("../../../assets/images/onboardImage1.jpg")}
+        style={{marginBottom: 30}}
+        source={{
+          uri: "https://t3.ftcdn.net/jpg/04/09/76/38/360_F_409763869_m3QVL4OELQaLmRU8AEicBlkduNlBAMpm.jpg",
+        }}
       >
       <View style={style.header}>
         <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
       </View>
       
-      <Text
-        style={{
-          fontSize: 30,
-          marginLeft: "30%",
-          fontWeight: "bold",
-          marginTop: "2%",
-          marginBottom: "1%",
-          width: "100%",
-          color: COLORS.white,
-          fontWeight: "bold",
-        }}
-      >
-        User Feedbacks
-      </Text>
+      
       
       <View style={style.buttonContainer}>
         <TouchableOpacity
@@ -197,72 +190,103 @@ const BookFeedback = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
       </ImageBackground>
-      <ScrollView>
-        {feedbacks.map((post) => (
-          <TouchableOpacity key={post._id} style={style.post}>
-            <View style={style.postContent}>
-              <Text style={style.postTitle}>
-                User - {user.fullName}
-                <Icon
-                  justifyContent="flex-end"
-                  name="star"
-                  size={responsiveFontSize(4)}
-                  color="#ffb300"
-                />
-                {post.rating}/5
-              </Text>
-              {post.user._id === user._id ? (
-                <View
-                  style={{
-                    width: "10%",
-                    marginLeft: "77%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.push("UpdateFeedback", post);
-                    }}
-                  >
-                    <Icon name="edit" size={35} color={COLORS.blue} />
-                  </TouchableOpacity>
-                  <View
-                    style={{
-                      marginLeft: "30%",
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        Alert.alert(
-                          "Delete Book",
-                          "Are you sure you want to delete your feedback?",
-                          [
-                            {
-                              text: "OK",
-                              onPress: () => deletefeedback(post._id),
-                            },
-                            {
-                              text: "Cancel",
-                              onPress: () => console.log("Cancel Pressed"),
-                            },
-                          ]
-                        );
+      {feedbacks.length > 0 ? (
+            <ScrollView>
+            {feedbacks.map((post) => (
+              <TouchableOpacity key={post._id} style={style.post}>
+                <View style={style.postContent}>
+                  <Text style={style.postTitle}>
+                    {post.user.fullName}
+                    <Icon
+                      justifyContent="flex-end"
+                      name="star"
+                      size={responsiveFontSize(4)}
+                      color="#ffb300"
+                    />
+                    {post.rating}/5
+                  </Text>
+                  {post.user._id === user._id ? (
+                    <View
+                      style={{
+                        width: "10%",
+                        marginLeft: "77%",
+                        flexDirection: "row",
+                        alignItems: "center",
                       }}
                     >
-                      <Icon name="delete" size={35} color={COLORS.red} />
-                    </TouchableOpacity>
-                  </View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          navigation.push("UpdateFeedback", post);
+                        }}
+                      >
+                        <Icon name="edit" size={35} color={COLORS.blue} />
+                      </TouchableOpacity>
+                      <View
+                        style={{
+                          marginLeft: "30%",
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
+                            Alert.alert(
+                              "Delete Book",
+                              "Are you sure you want to delete your feedback?",
+                              [
+                                {
+                                  text: "OK",
+                                  onPress: () => deletefeedback(post._id),
+                                },
+                                {
+                                  text: "Cancel",
+                                  onPress: () => console.log("Cancel Pressed"),
+                                },
+                              ]
+                            );
+                          }}
+                        >
+                          <Icon name="delete" size={35} color={COLORS.red} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : null}
+    
+                  <Text style={style.postMeta}>Created at | {moment(user.createdAt).format("YYYY-MM-DD")}</Text>
+                  <Text style={style.postExcerpt}>{post.feedback}</Text>
                 </View>
-              ) : null}
-
-              <Text style={style.postMeta}>| {post.createdAt}</Text>
-              <Text style={style.postExcerpt}>{post.feedback}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+      ): (
+        <View
+            style={{
+              alignItems: "center",
+              marginTop: "40%",
+              justifyContent: "center",
+            }}
+          >
+            <LottieView
+              source={require("../../../assets/searching.json")}
+              autoPlay
+              loop
+              style={{ width: 100, height: 100 }}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+                color: "grey",
+                marginTop: 10,
+                alignItems: "center",
+              }}
+            >
+              No Feedbacks Yet
+            </Text>
+          </View>
+      )}
+      
     </SafeAreaView>
+    {loading ? <CustomLoading /> : ""}
+    </>
   );
 };
 
@@ -346,12 +370,12 @@ const style = StyleSheet.create({
     height: responsiveHeight(5),
     backgroundColor: COLORS.green,
     borderRadius: 15,
-    marginRight: "2%",
+    marginRight: "3%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginTop: responsiveHeight(13),
+    marginTop: responsiveHeight(29),
     maxWidth: 200,
   },
 

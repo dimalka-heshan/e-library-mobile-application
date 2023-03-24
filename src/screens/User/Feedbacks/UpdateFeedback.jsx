@@ -5,6 +5,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  ImageBackground,
+  StatusBar
 } from "react-native";
 import React, { useState } from "react";
 import COLORS from "../../../constants/color";
@@ -74,31 +76,19 @@ const UpdateFeedback = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView
-      style={{
-        width: "100%",
-        height: "100%",
-        // backgroundColor: COLORS.white,
-      }}
-    >
+    <SafeAreaView style={{ flex: 6 }}>
+      <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
+      <ImageBackground
+        style={{height:300}}
+        source={{
+          uri: "https://i0.wp.com/ketto.blog/wp-content/uploads/2021/09/shutterstock_1100033681-min-1.jpg?fit=5000%2C2813&ssl=1",
+        }}
+      >
       <View style={styles.header}>
         <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
       </View>
 
-      <View>
-        <Text
-          style={{
-            fontSize: 27,
-            color: COLORS.blue,
-            fontWeight: "bold",
-            marginLeft: "3%",
-            marginTop: "1%",
-            justifyContent: "center",
-          }}
-        >
-          Update your Feedback
-        </Text>
-      </View>
+     </ImageBackground>
 
       <View style={styles.container}>
         <Text style={styles.heading}>

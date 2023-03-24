@@ -5,6 +5,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  StatusBar,
+  ImageBackground
 } from "react-native";
 import React, { useState } from "react";
 import COLORS from "../../../constants/color";
@@ -56,22 +58,23 @@ const CreateFeedback = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView
-      style={{
-        width: "100%",
-        height: "100%",
-        // backgroundColor: COLORS.white,
-      }}
-    >
+    <SafeAreaView style={{ flex: 6 }}>
+      <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
+      <ImageBackground
+        style={{height:300}}
+        source={{
+          uri: "https://cdn.shrm.org/image/upload/c_crop,h_768,w_1366,x_0,y_0/c_fit,f_auto,q_auto,w_767/v1/People%20Managers/Honest_Feedback_photo_fcxcie?databtoa=eyIxNng5Ijp7IngiOjAsInkiOjAsIngyIjoxMzY2LCJ5MiI6NzY4LCJ3IjoxMzY2LCJoIjo3Njh9fQ%3D%3D",
+        }}
+      >
       <View style={styles.header}>
         <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
       </View>
 
-      <View>
+      {/* <View>
         <Text
           style={{
             fontSize: 27,
-            color: COLORS.blue,
+            color: COLORS.white,
             fontWeight: "bold",
             marginLeft: "3%",
             marginTop: "1%",
@@ -80,8 +83,8 @@ const CreateFeedback = ({ navigation, route }) => {
         >
           Create your Feedback
         </Text>
-      </View>
-
+      </View> */}
+      </ImageBackground>
       <View style={styles.container}>
         <Text style={styles.heading}>
           {starRating ? `${starRating}*` : "Tap to rate"}
