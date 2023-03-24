@@ -38,6 +38,8 @@ const SignUpScreen = ({ navigation }) => {
   // sign up handler
   const handleSignUp = async () => {
     setLoading(true);
+    setError("");
+    setValidationErrors({});
     if (password == confirmPassword) {
       //constuct request body
       body.append("fullName", fullName);
@@ -75,9 +77,8 @@ const SignUpScreen = ({ navigation }) => {
               setLoading(false);
               setError(err.response.data.message);
             } else {
-              setError("");
-              setLoading(false);
               setValidationErrors(err.response.data.data);
+              setLoading(false);
             }
           } else {
             setLoading(false);
@@ -112,7 +113,10 @@ const SignUpScreen = ({ navigation }) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
     >
-      <ScrollView>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View>
             <Image source={SignUp} style={styles.LogoImage} />

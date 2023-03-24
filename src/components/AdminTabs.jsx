@@ -26,10 +26,16 @@ import Advertisement from "../screens/Admin/Advertisements/AllAdvertisementsScre
 import AddAdvertisementScreen from "../screens/Admin/Advertisements/AddAdvertisementScreen";
 import UpdateAdvertisementScreen from "../screens/Admin/Advertisements/UpdateAdvertisementScreen";
 import AdvertisementDetails from "../screens/Admin/Advertisements/AdvertisementDetails";
+import AdminBlogs from "../screens/Admin/Blogs/AdminBlogs";
+import Advertisement from "../screens/Admin/Advertisements/Advertisements";
 
 import AddBookScreen from "../screens/Admin/Books/AddBookScreen";
 import AllBookScreen from "../screens/Admin/Books/AllBookScreen";
 import UpdateBookScreen from "../screens/Admin/Books/UpdateBookScreen";
+import AdminBlogContent from "../screens/Admin/Blogs/AdminBlogContent";
+import AddBlog from "../screens/Admin/Blogs/AddBlog";
+import EditBlog from "../screens/Admin/Blogs/EditBlog";
+import OneBookScreen from "../screens/Admin/Books/OneBookScreen";
 
 const BlogsStack = createNativeStackNavigator();
 const BooksStack = createNativeStackNavigator();
@@ -50,6 +56,14 @@ function BooksStackScreen() {
       <BooksStack.Screen
         name="AddBookScreen"
         component={AddBookScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BooksStack.Screen
+        name="OneBookScreen"
+        component={OneBookScreen}
         options={{
           headerShown: false,
         }}
@@ -119,8 +133,32 @@ function BlogsStackScreen() {
   return (
     <BlogsStack.Navigator>
       <BlogsStack.Screen
-        name="Blogs"
-        component={Blogs}
+        name="AdminBlogs"
+        component={AdminBlogs}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AdminBlogContent"
+        component={AdminBlogContent}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="AddBlog"
+        component={AddBlog}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BlogsStack.Screen
+        name="EditBlog"
+        component={EditBlog}
         options={{
           headerShown: false,
         }}
@@ -229,7 +267,7 @@ export default function AdminTabs() {
         // Extra Tab Screen For Action Button..
       }
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name={"ActionButton"}
         component={AdvertisementStackScreen}
         options={{
@@ -258,7 +296,7 @@ export default function AdminTabs() {
             </TouchableOpacity>
           ),
         }}
-      ></Tab.Screen>
+      ></Tab.Screen> */}
 
       <Tab.Screen
         name={"BlogsStack"}
@@ -312,7 +350,6 @@ export default function AdminTabs() {
           ),
         }}
         listeners={({ navigation, route }) => ({
-          // Onpress Update....
           tabPress: (e) => {
             Animated.spring(tabOffsetValue, {
               toValue: getWidth() * 3.88,

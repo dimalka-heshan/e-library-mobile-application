@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import axios from "axios";
 import constants from "./src/constants/constants";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserTabs from "./src/components/UserTabs";
 import AdminTabs from "./src/components/AdminTabs";
 import LandingScreen from "./src/screens/Landing/LandingScreen";

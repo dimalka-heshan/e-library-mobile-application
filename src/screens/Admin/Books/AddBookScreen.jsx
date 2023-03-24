@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -20,18 +21,24 @@ import bookCategory from "../../../constants/bookCategory";
 import { MultiSelect } from "react-native-element-dropdown";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 const AddBook = ({ navigation }) => {
   const [bookName, setBookName] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookDescription, setBookDescription] = useState("");
-  const [bookImage, setBookImage] = useState(null);
+  const [bookImage, setBookImage] = useState({});
   const [imageUploadStatus, setImageUploadStatus] = useState(
     "Choose Book Picture"
   );
-  const [eBookFile, setEBookFile] = useState([]);
+  const [eBookFile, setEBookFile] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [pdfUploadStatus, setPdfUploadStatus] = useState("Choose E-Book File");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState("");
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
 
   //For Multiple selection
   const renderItem = (item) => {
@@ -51,10 +58,14 @@ const AddBook = ({ navigation }) => {
       });
 
       if (result.type === "success") {
-        setEBookFile(result);
+        setEBookFile({
+          uri: result.uri,
+          mimeType: "application/pdf",
+          name: "file.pdf",
+        });
         setPdfUploadStatus("E-Book File Uploaded");
       } else {
-        setEBookFile([]);
+        setEBookFile({});
         setPdfUploadStatus("Choose E-Book File");
       }
     } catch (e) {
@@ -62,17 +73,25 @@ const AddBook = ({ navigation }) => {
     }
   };
 
+  AsyncStorage.getItem("token").then((value) => {
+    setToken(value);
+  });
+
   //for Image upload
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 12],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setBookImage(result);
+      setBookImage({
+        uri: result.assets[0].uri,
+        mimeType: "image/jpeg",
+        name: "image.jpg",
+      });
       setImageUploadStatus("Book Picture Uploaded");
     } else {
       setBookImage(null);
@@ -80,122 +99,252 @@ const AddBook = ({ navigation }) => {
     }
   };
 
+  //Add book handler
+  const handleAddBook = async () => {
+    setLoading(true);
+    setError("");
+    setValidationErrors({});
+    const body = new FormData();
+    body.append("bookName", bookName);
+    body.append("bookAuthor", bookAuthor);
+    body.append("bookDescription", bookDescription);
+    body.append("files", bookImage);
+    body.append("files", eBookFile);
+
+    //for multiple selection
+    if (selectedItems.length > 0) {
+      for (var i = 0; i < selectedItems.length; i++) {
+        body.append(`bookCategories[${i}]`, selectedItems[i]);
+      }
+    }
+    try {
+      await axios
+        .post("/book/createBook", body, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          setLoading(false);
+          Alert.alert("Success", "Book Added Successfully!", [
+            {
+              text: "OK",
+              onPress: () => navigation.push("AllBookScreen"),
+            },
+          ]);
+        })
+        .catch((err) => {
+          setLoading(false);
+          if (err.response.status == 400) {
+            if (err.response.data.message != "Data validation error!") {
+              setError(err.response.data.message);
+            } else {
+              setError("");
+              setValidationErrors(err.response.data.data);
+            }
+          } else {
+            setError("Something went wrong!");
+          }
+        });
+    } catch (e) {
+      setLoading(false);
+      setError("Something went wrong!");
+    }
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
-    >
-      <View style={styles.arrowHeader}>
-        <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-      </View>
-      <View
-        style={{
-          width: "80%",
-          alignSelf: "center",
-        }}
+    <>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" || "android" ? "padding" : "height"}
       >
-        <Text style={styles.header}>Add Book</Text>
-      </View>
-      <ScrollView
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <View style={styles.container}>
-          <View style={styles.textInputContainer}>
-            <View style={styles.loginContainer}>
-              <CustomTextInput
-                placeholder="Book Name"
-                onChangeText={setBookName}
-              />
-              <CustomTextInput
-                placeholder="Book Author"
-                onChangeText={setBookAuthor}
-              />
-              <MultiSelect
-                style={styles.textInput}
-                placeholderStyle={{
-                  fontSize: 14,
-                  color: "grey",
-                }}
-                search
-                data={bookCategory.bookCategory}
-                labelField="label"
-                valueField="value"
-                placeholder="Select Category"
-                searchPlaceholder="Search..."
-                value={selectedItems}
-                onChange={(item) => {
-                  setSelectedItems(item);
-                }}
-                renderItem={renderItem}
-                renderSelectedItem={(item, unSelect) => (
-                  <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-                    <View
+        <View style={styles.arrowHeader}>
+          <Icon
+            name="arrow-back-ios"
+            size={28}
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+        <View
+          style={{
+            width: "80%",
+            alignSelf: "center",
+          }}
+        >
+          <Text style={styles.header}>Add Book</Text>
+        </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <View style={styles.container}>
+            <View style={styles.textInputContainer}>
+              <View style={styles.loginContainer}>
+                <CustomTextInput
+                  placeholder="Book Name"
+                  onChangeText={setBookName}
+                />
+
+                {validationErrors.bookName ? (
+                  <Text style={styles.errorText}>
+                    {validationErrors.bookName}
+                  </Text>
+                ) : (
+                  ""
+                )}
+
+                <CustomTextInput
+                  placeholder="Book Author"
+                  onChangeText={setBookAuthor}
+                />
+
+                {validationErrors.bookAuthor ? (
+                  <Text style={styles.errorText}>
+                    {validationErrors.bookAuthor}
+                  </Text>
+                ) : (
+                  ""
+                )}
+
+                <MultiSelect
+                  style={styles.textInput}
+                  placeholderStyle={{
+                    fontSize: 14,
+                    color: "grey",
+                  }}
+                  search
+                  data={bookCategory.bookCategory}
+                  labelField="label"
+                  valueField="value"
+                  placeholder="Select Category"
+                  searchPlaceholder="Search..."
+                  value={selectedItems}
+                  onChange={(item) => {
+                    setSelectedItems(item);
+                  }}
+                  renderItem={renderItem}
+                  renderSelectedItem={(item, unSelect) => (
+                    <TouchableOpacity
+                      onPress={() => unSelect && unSelect(item)}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          padding: 10,
+                          backgroundColor: "white",
+                          borderRadius: 5,
+                          gap: 10,
+                          marginBottom: "9%",
+                          marginLeft: "8%",
+                        }}
+                      >
+                        <Text style={styles.textSelectedStyle}>
+                          {item.label}
+                        </Text>
+                        <Icon name="delete" size={20} color="red" />
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                />
+                {validationErrors.bookCategories ? (
+                  <Text style={styles.errorTextSelection}>
+                    {validationErrors.bookCategories}
+                  </Text>
+                ) : (
+                  ""
+                )}
+                <TextInput
+                  style={styles.textArea}
+                  placeholder="Book Description"
+                  multiline={true}
+                  numberOfLines={20}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  onChangeText={(text) => setBookDescription(text)}
+                />
+
+                {validationErrors.bookDescription ? (
+                  <Text style={styles.errorText}>
+                    {validationErrors.bookDescription}
+                  </Text>
+                ) : (
+                  ""
+                )}
+
+                <View style={styles.imageUploadField}>
+                  <TextInput
+                    style={styles.ImageTextInput}
+                    placeholder="Choose File"
+                    editable={false}
+                    selectTextOnFocus={false}
+                    value={imageUploadStatus}
+                  />
+                  <TouchableOpacity
+                    onPress={pickImage}
+                    style={styles.uploadButton}
+                  >
+                    <Text style={styles.uploadTxt}>Upload</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.imageUploadField}>
+                  <TextInput
+                    style={styles.ImageTextInput}
+                    placeholder="Choose File"
+                    editable={false}
+                    selectTextOnFocus={false}
+                    value={pdfUploadStatus}
+                  />
+                  <TouchableOpacity
+                    style={styles.uploadButton}
+                    onPress={selectFile}
+                  >
+                    <Text style={styles.uploadTxt}>Upload</Text>
+                  </TouchableOpacity>
+                </View>
+                {error ? (
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 40,
+                      backgroundColor: "red",
+                      borderRadius: 10,
+                      alignContent: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        padding: 10,
-                        backgroundColor: "white",
-                        borderRadius: 5,
-                        gap: 10,
-                        marginBottom: "9%",
-                        marginLeft: "8%",
+                        color: "white",
+                        fontSize: 12,
+                        fontWeight: "bold",
                       }}
                     >
-                      <Text style={styles.textSelectedStyle}>{item.label}</Text>
-                      <Icon name="delete" size={20} color="red" />
-                    </View>
-                  </TouchableOpacity>
+                      {error}
+                    </Text>
+                  </View>
+                ) : (
+                  ""
                 )}
-              />
-              <TextInput
-                style={styles.textArea}
-                placeholder="Book Description"
-                multiline={true}
-                numberOfLines={20}
-                onChangeText={(text) => setBookDescription(text)}
-              />
-              <View style={styles.imageUploadField}>
-                <TextInput
-                  style={styles.ImageTextInput}
-                  placeholder="Choose File"
-                  editable={false}
-                  selectTextOnFocus={false}
-                  value={imageUploadStatus}
-                />
-                <TouchableOpacity
-                  onPress={pickImage}
-                  style={styles.uploadButton}
-                >
-                  <Text style={styles.uploadTxt}>Upload</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.imageUploadField}>
-                <TextInput
-                  style={styles.ImageTextInput}
-                  placeholder="Choose File"
-                  editable={false}
-                  selectTextOnFocus={false}
-                  value={pdfUploadStatus}
-                />
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={selectFile}
-                >
-                  <Text style={styles.uploadTxt}>Upload</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Add Book</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={handleAddBook}
+                    style={styles.loginButton}
+                  >
+                    <Text style={styles.loginButtonText}>Add Book</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      {loading ? <CustomLoading /> : ""}
+    </>
   );
 };
 
@@ -341,5 +490,24 @@ const styles = StyleSheet.create({
   uploadTxt: {
     color: "black",
     fontWeight: "bold",
+  },
+
+  errorText: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-4%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
+  },
+  errorTextSelection: {
+    width: "100%",
+    marginLeft: "3%",
+    color: "red",
+    marginTop: "-2%",
+    marginBottom: "3%",
+    fontSize: 12,
+    textAlign: "left",
   },
 });
