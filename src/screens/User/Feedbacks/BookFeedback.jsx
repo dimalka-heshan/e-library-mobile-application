@@ -97,6 +97,8 @@ const BookFeedback = ({ navigation, route }) => {
   });
   const [user, setUser] = React.useState("");
 
+  
+  
   const filterdata = [
     {key:'1', value:'1 Star',},
     {key:'2', value:'2 Stars'},
@@ -106,6 +108,8 @@ const BookFeedback = ({ navigation, route }) => {
     
 ]
 
+
+ 
   const getUserDetails = () => {
     setLoading(true);
     axios
@@ -143,6 +147,37 @@ const BookFeedback = ({ navigation, route }) => {
         }
       });
   };
+
+
+   //feedback search function
+   const filterDatas = (books, searchKey) => {
+    // console.log(searchKey);
+    let temp = []
+    
+    books.forEach(element => {
+      if (parseInt(element.rating) == searchKey) {
+        temp.push(element)
+      }
+      
+    }
+    );
+  setFeedbacks(temp)
+    // console.log(result);
+    // setFeedbacks(result);
+  };
+
+  const filterFeedbacks = async (e) => {
+    await axios
+    .get(`/feedback/getFeedbacks/${book}`)
+    .then((res) => {
+      // console.log(res.data.feedbacks);
+      filterDatas(res.data.feedbacks,e)
+      
+    })
+    .catch((err) => {
+      console.log(JSON.stringify(err));
+    });
+  }
 
   //delete feedback
   const deletefeedback = async (id) => {
@@ -205,11 +240,11 @@ const BookFeedback = ({ navigation, route }) => {
       <View style={style.searchContainer}>
       <Text style={style.filtertext}>Filter Feedbacks by Stars:   </Text>
       
-      <MultipleSelectList 
-        setSelected={(val) => setSelected(val)} 
+      <SelectList  
+        setSelected={(key) => filterFeedbacks(key)} 
         data={filterdata} 
-        save="value"
-        onSelect={() => alert(selected)} 
+        save="key"
+         
         label="Categories"
     /></View>
     
