@@ -5,7 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert
+  Alert,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -22,18 +22,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const book = {
   id: 1,
   name: "Game Of Thrones The Dance Of Dragons",
- };
+};
 
- const mycomment = {
+const mycomment = {
   id: 1,
-    rating: "5",
-    name: "Ravindu sandeepana",
-    date: "January 1, 2020",
-    comment:
-      "Ravindu mycommentt, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.",
- };
+  rating: "5",
+  name: "Ravindu sandeepana",
+  date: "January 1, 2020",
+  comment:
+    "Ravindu mycommentt, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.",
+};
 
- const posts = [
+const posts = [
   {
     id: 1,
     rating: "5",
@@ -76,22 +76,19 @@ const book = {
   },
 ];
 
-
-const BookFeedback = ({navigation, route}) => {
+const BookFeedback = ({ navigation, route }) => {
   const [loading, setLoading] = React.useState(false);
   const [createdAt, setCreatedAt] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [rating, setRating] = useState("");
+  // const [bookID, setBookID] = useState(route.params);
 
   const book = route.params;
-console.log(book);
-
   const [token, setToken] = React.useState("");
   AsyncStorage.getItem("token").then((token) => {
     setToken(token);
   });
   const [user, setUser] = React.useState("");
-  
 
   const getUserDetails = () => {
     setLoading(true);
@@ -107,18 +104,16 @@ console.log(book);
       });
   };
 
-  
   const getAllFeedbacks = async () => {
     setLoading(true);
 
     await axios
-      .get(`/feedback/getFeedbacks/${book._id}`)
+      .get(`/feedback/getFeedbacks/${book}`)
       .then((res) => {
         // console.log(res.data.feedbacks._id);
 
         setLoading(false);
         setFeedbacks(res.data.feedbacks);
-       
       })
       .catch((err) => {
         setLoading(false);
@@ -134,13 +129,11 @@ console.log(book);
       });
   };
 
-
-
-   //delete feedback
-   const deletefeedback = async (id) => {
+  //delete feedback
+  const deletefeedback = async (id) => {
     setLoading(true);
     await axios
-      .delete(`/feedback/deleteFeedback/${id}`, { 
+      .delete(`/feedback/deleteFeedback/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -150,8 +143,7 @@ console.log(book);
         Alert.alert("Success", "Feedback deleted successfully", [
           {
             text: "OK",
-            onPress: () => navigation.push("BookFeedback",book),
-            
+            onPress: () => navigation.push("BookFeedback", book),
           },
         ]);
       })
@@ -168,7 +160,6 @@ console.log(book);
 
   // console.log(feedbacks);
 
-  
   return (
     <SafeAreaView
       style={{
@@ -191,7 +182,6 @@ console.log(book);
           width: "100%",
           color: COLORS.blue,
           fontWeight: "bold",
-          
         }}
       >
         User Feedbacks
@@ -199,7 +189,7 @@ console.log(book);
 
       <View style={style.buttonContainer}>
         <TouchableOpacity
-          onPress={() => navigation.push("CreateFeedback")}
+          onPress={() => navigation.push("CreateFeedback", book)}
           style={style.getStartedButton}
         >
           <Text style={style.buttonText}>Add Feedback</Text>
@@ -212,7 +202,7 @@ console.log(book);
           <TouchableOpacity key={post.id} style={style.post}>
             <View style={style.postContent}>
               <Text style={style.postTitle}>
-               User - {user.fullName}
+                User - {user.fullName}
                 <Icon
                   justifyContent="flex-end"
                   name="star"
@@ -221,48 +211,47 @@ console.log(book);
                 />
                 {post.rating}/5
               </Text>
-             {
-              post.user._id === user._id ? (
+              {post.user._id === user._id ? (
                 <View
-                style={{
-                  width: "10%",
-                  marginLeft:"77%",
-                  flexDirection:"row",
-                  alignItems:"center"
-                }}
-              >
-                <TouchableOpacity >
-                  <Icon name="edit" size={35} color={COLORS.blue} />
-                </TouchableOpacity>
-              <View style={{
-                  marginLeft:"30%",
-                  
-                }} >
-              <TouchableOpacity 
-              onPress={() => {
-                Alert.alert(
-                  "Delete Book",
-                  "Are you sure you want to delete your feedback?",
-                  [
-                    {
-                      text: "OK",
-                      onPress: () => deletefeedback(post._id),
-                    },
-                    {
-                      text: "Cancel",
-                      onPress: () => console.log("Cancel Pressed"),
-                    },
-                  ]
-                );
-              }}>
-              
-                <Icon name="delete" size={35} color={COLORS.red} />
-              </TouchableOpacity>
-              </View>
-              </View>
-              ) : null
-             }
-              
+                  style={{
+                    width: "10%",
+                    marginLeft: "77%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity>
+                    <Icon name="edit" size={35} color={COLORS.blue} />
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      marginLeft: "30%",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.alert(
+                          "Delete Book",
+                          "Are you sure you want to delete your feedback?",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => deletefeedback(post._id),
+                            },
+                            {
+                              text: "Cancel",
+                              onPress: () => console.log("Cancel Pressed"),
+                            },
+                          ]
+                        );
+                      }}
+                    >
+                      <Icon name="delete" size={35} color={COLORS.red} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : null}
+
               <Text style={style.postMeta}>| {post.createdAt}</Text>
               <Text style={style.postExcerpt}>{post.feedback}</Text>
             </View>
@@ -271,115 +260,110 @@ console.log(book);
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
+export default BookFeedback;
 
-  export default BookFeedback;
+const style = StyleSheet.create({
+  header: {
+    paddingHorizontal: "5%",
+    marginTop: "10%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 
+  post: {
+    marginTop: "-1%",
+    marginBottom: 20,
+    backgroundColor: "#E5E4E2",
+    marginLeft: 20,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10,
+      height: 10,
+    },
+  },
 
-  const style = StyleSheet.create({
-    header: {
-      paddingHorizontal: "5%",
-      marginTop: "10%",
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
+  postContent: {
+    marginTop: "0%",
+    padding: 20,
+  },
+  postTitle: {
+    fontSize: 20,
+    width: "80%",
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  postMeta: {
+    fontSize: 14,
+    color: "#999",
+    marginBottom: 10,
+  },
+  postExcerpt: {
+    fontSize: 14,
+  },
+  title: {
+    marginTop: 40,
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 30,
+    marginLeft: 20,
+  },
 
-    post: {
-      marginTop:"-1%",
-      marginBottom: 20,
-      backgroundColor: "#E5E4E2",
-      marginLeft: 20,
-      marginRight: 20,
-      borderRadius: 10,
-      shadowColor: "#000",
-      shadowOpacity: 0.06,
-      shadowOffset: {
-        width: 10,
-        height: 10,
-      },
+  mypost: {
+    marginBottom: 20,
+    backgroundColor: "#E5E4E2",
+    height: 250,
+    marginTop: -75,
+    marginLeft: 20,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10,
+      height: 10,
     },
-    
-    postContent: {
-      marginTop:"0%",
-      padding: 20,
-    },
-    postTitle: {
-      fontSize: 20,
-      width: "80%",
-      fontWeight: "bold",
-      marginBottom: 10,
-    },
-    postMeta: {
-      fontSize: 14,
-      color: "#999",
-      marginBottom: 10,
-    },
-    postExcerpt: {
-      fontSize: 14,
-    },
-    title: {
-      marginTop: 40,
-      fontSize: 28,
-      fontWeight: "bold",
-      marginBottom: 30,
-      marginLeft: 20,
-    },
+  },
+  buttonContainer: {
+    width: "100%",
+    height: "16%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-around",
+    alignItems: "flex-end",
+    marginLeft: 5,
+  },
+  getStartedButton: {
+    width: responsiveWidth(55),
+    height: responsiveHeight(6),
+    backgroundColor: COLORS.green,
+    borderRadius: 15,
+    marginRight: "2%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginTop: responsiveHeight(-5),
+    maxWidth: 200,
+  },
 
-    mypost: {
-      marginBottom: 20,
-      backgroundColor: "#E5E4E2",
-      height:250,
-      marginTop: -75,
-      marginLeft: 20,
-      marginRight: 20,
-      borderRadius: 10,
-      shadowColor: "#000",
-      shadowOpacity: 0.06,
-      shadowOffset: {
-        width: 10,
-        height: 10,
-      },
-    },
-    buttonContainer: {
-      width: "100%",
-      height: "16%",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-around",
-      alignItems: "flex-end",
-      marginLeft: 5
-    },
-    getStartedButton: {
-      width: responsiveWidth(55),
-      height: responsiveHeight(6),
-      backgroundColor: COLORS.green,
-      borderRadius: 15,
-      marginRight:"2%",
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-around",
-      alignItems: "center",
-      marginTop: responsiveHeight(-5),
-      maxWidth: 200,
-    },
-    
-    
   buttonText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 19,
   },
 
-  editButton:{
+  editButton: {
     justifyContent: "space-around",
-    alignItems: "baseline"
+    alignItems: "baseline",
   },
 
-  deleteButton:{
+  deleteButton: {
     justifyContent: "space-around",
-    alignItems: "flex-end"
-  }
-    
-  });
-  
+    alignItems: "flex-end",
+  },
+});
