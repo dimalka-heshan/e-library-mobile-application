@@ -181,6 +181,7 @@ const AllAdvertisementsScreen = ({ navigation }) => {
                         fontSize: 16,
                         fontWeight: "bold",
                         marginTop: "-25%",
+                        marginRight: 10
                       }}
                     >
                       {Advertisement.adTitle}
