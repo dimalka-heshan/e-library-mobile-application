@@ -49,7 +49,7 @@ const SignUpScreen = ({ navigation }) => {
       if (image) {
         body.append("picture", {
           uri: image,
-          type: "image/jpeg",
+          mimetype: "image/jpeg",
           name: "image.jpg",
         });
       }
