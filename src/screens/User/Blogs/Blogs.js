@@ -534,6 +534,8 @@ const style = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "center",
     elevation: 12,
+    borderColor: COLORS.grey,
+    borderWidth: 1,
   },
   categoryContainer: {
     marginTop: 70,
