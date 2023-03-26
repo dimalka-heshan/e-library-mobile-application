@@ -154,6 +154,7 @@ const AllAdvertisementsScreen = ({ navigation }) => {
           <View style={styles.container}>
             {allAdvertisements.map((Advertisement) => (
               <TouchableOpacity
+                key={Advertisement._id}
                 onPress={() =>
                   navigation.push("AdvertisementDetails", {
                     advertisementId: Advertisement._id,
@@ -181,7 +182,7 @@ const AllAdvertisementsScreen = ({ navigation }) => {
                         fontSize: 16,
                         fontWeight: "bold",
                         marginTop: "-25%",
-                        marginRight: 10
+                        marginRight: 10,
                       }}
                     >
                       {Advertisement.adTitle}

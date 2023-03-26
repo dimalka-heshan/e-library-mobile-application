@@ -32,6 +32,7 @@ const UpdateAdvertisement = ({ navigation }) => {
     "Choose Advertisement Picture"
   );
   const [selectedItems, setSelectedItems] = useState([]);
+  const [error, setError] = useState("");
 
   var route = useRoute();
 
@@ -99,35 +100,26 @@ const UpdateAdvertisement = ({ navigation }) => {
       name: "image.jpg",
     });
 
-    console.log(JSON.stringify(body));
-
-    await axios
-      .patch(`/advertisement/updateAdvertisement/${advertisementId}`, body, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        setLoading(false);
-        Alert.alert("Success", "Advertisement updated successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.push("Advertisement"),
+    if (adTitle == "" || adDescription == "" || adVideoUrl == "") {
+      setLoading(false);
+      setError("Plaese fill all fields !!!");
+    } else {
+      await axios
+        .patch(`/advertisement/updateAdvertisement/${advertisementId}`, body, {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-        ]);
-      })
-      .catch((err) => {
-        setLoading(false);
-        if (err.response.status == 400) {
-          if (err.response.data.message != "Data validation error!") {
-            setError(err.response.data.message);
-          } else {
-            setValidationErrors(err.response.data.data);
-          }
-        } else {
-          setError("Something went wrong!");
-        }
-      });
+        })
+        .then((res) => {
+          setLoading(false);
+          Alert.alert("Success", "Advertisement updated successfully", [
+            {
+              text: "OK",
+              onPress: () => navigation.push("Advertisement"),
+            },
+          ]);
+        });
+    }
   };
 
   return (
@@ -192,6 +184,31 @@ const UpdateAdvertisement = ({ navigation }) => {
                   value={adVideoUrl}
                   onChangeText={setAdVideoUrl}
                 />
+                {error ? (
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 40,
+                      backgroundColor: "red",
+                      borderRadius: 10,
+                      alignContent: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 12,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {error}
+                    </Text>
+                  </View>
+                ) : (
+                  ""
+                )}
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={UpdateAdvertisement}

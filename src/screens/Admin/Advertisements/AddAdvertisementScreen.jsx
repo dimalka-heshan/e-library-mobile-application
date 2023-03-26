@@ -74,33 +74,27 @@ const AddAdvertisement = ({ navigation }) => {
       name: "image.jpg",
     });
 
-    await axios
-      .post("/advertisement/createAdvertisement", body, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        setLoading(false);
-        Alert.alert("Success", "Advertisement Published Successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.push("Advertisement"),
+    if (adTitle == "" || adDescription == "" || adVideoUrl == "") {
+      setLoading(false);
+      setError("Plaese fill all fields !!!");
+    } else {
+      await axios
+        .post("/advertisement/createAdvertisement", body, {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-        ]);
-      })
-      .catch((err) => {
-        setLoading(false);
-        if (err.response.status == 400) {
-          if (err.response.data.message != "Data validation error!") {
-            setError(err.response.data.message);
-          } else {
-            setValidationErrors(err.response.data.data);
-          }
-        } else {
-          setError("Something went wrong!");
-        }
-      });
+        })
+        .then((res) => {
+          console.log(res.data);
+          setLoading(false);
+          Alert.alert("Success", "Advertisement Published Successfully", [
+            {
+              text: "OK",
+              onPress: () => navigation.push("Advertisement"),
+            },
+          ]);
+        });
+    }
   };
 
   return (
@@ -169,16 +163,6 @@ const AddAdvertisement = ({ navigation }) => {
                   placeholder="Advertisement Video Link"
                   onChangeText={setAdVideoUrl}
                 />
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    onPress={publishAdvertisement}
-                    style={styles.loginButton}
-                  >
-                    <Text style={styles.loginButtonText}>
-                      Add Advertisement
-                    </Text>
-                  </TouchableOpacity>
-                </View>
                 {error ? (
                   <View
                     style={{
@@ -204,6 +188,17 @@ const AddAdvertisement = ({ navigation }) => {
                 ) : (
                   ""
                 )}
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={publishAdvertisement}
+                    style={styles.loginButton}
+                  >
+                    <Text style={styles.loginButtonText}>
+                      Add Advertisement
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                
               </View>
             </View>
           </View>

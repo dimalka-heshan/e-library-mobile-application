@@ -116,7 +116,7 @@ const Advertisements = ({ navigation }) => {
                   advertisementId: post._id,
                 })
               }
-              key={post.id}
+              key={post._id}
               style={styles.post}
             >
               <Image
