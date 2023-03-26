@@ -113,7 +113,19 @@ const EditBlog = ({ navigation, route }) => {
 
   //Publish blog
   const publishBlog = async () => {
-    setError("");
+    if (!blogTitle || !blogContent || !blogCategory) {
+      setError("Please fill all the fields");
+      return;
+    }
+    if (blogTitle.length < 5) {
+      setError("Blog title should be atleast 5 characters long");
+      return;
+    }
+    if (blogContent.length < 10) {
+      setError("Blog content should be atleast 50 characters long");
+      return;
+    }
+
     body.append("blogTitle", blogTitle);
     body.append("blogContent", blogContent);
     body.append("blogBanner", blogImage);
@@ -331,7 +343,6 @@ const EditBlog = ({ navigation, route }) => {
                     alignContent: "center",
                     alignItems: "center",
                     justifyContent: "center",
-
                     top: -20,
                   }}
                 >
