@@ -22,6 +22,7 @@ import { useRoute } from "@react-navigation/native";
 import axios from "axios";
 import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
 import moment from "moment";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const post = {
   id: 1,
@@ -89,14 +90,21 @@ const AdvertisementDetails = ({ navigation }) => {
     {
       id: 2,
       title: "Advertisement title",
-      //url: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-      url: adVideoUrl,
+      url: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
+      // url: adVideoUrl,
     },
   ];
 
   return (
     <>
       <View style={styles.container}>
+      <View style={styles.header}>
+        <Icon
+          name="arrow-back-ios"
+          size={28}
+          onPress={() => navigation.goBack()}
+        />
+      </View>
         <Text style={styles.title}>{adTitle}</Text>
         <View style={styles.meta}>
           <Text style={styles.author}>by {post.author}</Text>
@@ -137,7 +145,7 @@ const AdvertisementDetails = ({ navigation }) => {
                       style={{
                         width: "97%",
                         height: 199,
-                        backgroundColor: "green",
+                        backgroundColor: "white",
                         borderRadius: 10,
                       }}
                     >
@@ -211,6 +219,12 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 20,
     backgroundColor: COLORS.white,
+  },
+  header: {
+    paddingHorizontal: "5%",
+    marginTop: "5%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 24,
