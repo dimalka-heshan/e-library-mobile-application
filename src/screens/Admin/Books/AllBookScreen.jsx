@@ -187,7 +187,7 @@ const AllBookScreen = ({ navigation }) => {
                       style={{
                         fontSize: 16,
                         fontWeight: "bold",
-                        letterSpacing: 1,
+                        letterSpacing: 0.4,
                         textAlign: "center",
                         lineHeight: 20,
                       }}

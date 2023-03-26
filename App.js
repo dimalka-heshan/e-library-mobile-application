@@ -43,7 +43,6 @@ export default function App() {
             headerShown: false,
           }}
         />
-
         <Stack.Screen
           name="AdminTabs"
           component={AdminTabs}

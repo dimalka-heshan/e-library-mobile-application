@@ -24,6 +24,10 @@ import { useRef } from "react";
 import HomeScreen from "../screens/User/Books/HomeScreen";
 import BookScreen from "../screens/User/Books/BookScreen";
 
+import BookFeedback from "../screens/User/Feedbacks/BookFeedback";
+import CreateFeedback from "../screens/User/Feedbacks/CreateFeedback"
+import UpdateFeedback from "../screens/User/Feedbacks/UpdateFeedback";
+
 import Profile from "../screens/User/Profile/Profile";
 
 import Blogs from "../screens/User/Blogs/Blogs";
@@ -59,6 +63,31 @@ function BooksStackScreen() {
           headerShown: false,
         }}
       />
+
+      <BooksStack.Screen
+        name="BookFeedback"
+        component={BookFeedback}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BooksStack.Screen
+        name="CreateFeedback"
+        component={CreateFeedback}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <BooksStack.Screen
+        name="UpdateFeedback"
+        component={UpdateFeedback}
+        options={{
+          headerShown: false,
+        }}
+      />
+
     </BooksStack.Navigator>
   );
 }
@@ -142,6 +171,7 @@ export default function UserTabs() {
           // Shadow...
           shadowColor: "#000",
           shadowOpacity: 0.06,
+          shadowRadius: 10,
           shadowOffset: {
             width: 10,
             height: 10,

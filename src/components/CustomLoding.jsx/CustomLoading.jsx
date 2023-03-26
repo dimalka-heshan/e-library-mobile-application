@@ -6,11 +6,11 @@ const CustomLoading = () => {
   return (
     <View style={[StyleSheet.absoluteFillObject, styles.container]}>
       {/* <LottieView
-        autoPlay
-        loop
-        source={require("../../assets/loading.json")}
-        style={{ width: 100, height: 100 }}
-      /> */}
+       autoPlay
+       loop
+       source={require("../../assets/loading.json")}
+       style={{ width: 100, height: 100 }}
+     /> */}
       <ActivityIndicator size="large" />
     </View>
   );

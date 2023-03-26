@@ -24,6 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomLoading from "../../../components/CustomLoding.jsx/CustomLoading";
+
 const AddBook = ({ navigation }) => {
   const [bookName, setBookName] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
@@ -60,7 +61,7 @@ const AddBook = ({ navigation }) => {
       if (result.type === "success") {
         setEBookFile({
           uri: result.uri,
-          mimeType: "application/pdf",
+          mimetype: "application/pdf",
           name: "file.pdf",
         });
         setPdfUploadStatus("E-Book File Uploaded");
@@ -89,7 +90,7 @@ const AddBook = ({ navigation }) => {
     if (!result.canceled) {
       setBookImage({
         uri: result.assets[0].uri,
-        mimeType: "image/jpeg",
+        mimetype: "image/jpeg",
         name: "image.jpg",
       });
       setImageUploadStatus("Book Picture Uploaded");
@@ -117,6 +118,7 @@ const AddBook = ({ navigation }) => {
         body.append(`bookCategories[${i}]`, selectedItems[i]);
       }
     }
+    console.log(JSON.stringify(body));
     try {
       await axios
         .post("/book/createBook", body, {

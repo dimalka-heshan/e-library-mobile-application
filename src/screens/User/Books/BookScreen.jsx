@@ -87,7 +87,9 @@ const BookScreen = ({ navigation, route }) => {
               >
                 {book.bookAuthor}
               </Text>
-              <TouchableOpacity onPress={() => {}}>
+              <TouchableOpacity
+                onPress={() => navigation.push("BookFeedback", book._id)}
+              >
                 <Text
                   style={{
                     fontSize: 15,
@@ -140,7 +142,7 @@ const BookScreen = ({ navigation, route }) => {
             }}
           >
             {book.bookCategories ? (
-              <Text>Book Categories: {book.bookCategories.join(", ")}</Text>
+              <Text>Book Categories : {book.bookCategories.join(", ")}</Text>
             ) : (
               ""
             )}
