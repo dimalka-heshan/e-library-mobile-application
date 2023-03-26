@@ -7,13 +7,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import React, { useRef, useState, useEffect } from "react";
 import COLORS from "../../../constants/color";
-import { MultipleSelectList, SelectList ,} from 'react-native-dropdown-select-list'
+import {
+  MultipleSelectList,
+  SelectList,
+} from "react-native-dropdown-select-list";
 import {
   responsiveHeight,
   responsiveWidth,
@@ -97,19 +100,14 @@ const BookFeedback = ({ navigation, route }) => {
   });
   const [user, setUser] = React.useState("");
 
-  
-  
   const filterdata = [
-    {key:'1', value:'1 Star',},
-    {key:'2', value:'2 Stars'},
-    {key:'3', value:'3 Stars'},
-    {key:'4', value:'4 Stars'},
-    {key:'5', value:'5 Stars'},
-    
-]
+    { key: "1", value: "1 Star" },
+    { key: "2", value: "2 Stars" },
+    { key: "3", value: "3 Stars" },
+    { key: "4", value: "4 Stars" },
+    { key: "5", value: "5 Stars" },
+  ];
 
-
- 
   const getUserDetails = () => {
     setLoading(true);
     axios
@@ -148,36 +146,32 @@ const BookFeedback = ({ navigation, route }) => {
       });
   };
 
-
-   //feedback search function
-   const filterDatas = (books, searchKey) => {
+  //feedback search function
+  const filterDatas = (books, searchKey) => {
     // console.log(searchKey);
-    let temp = []
-    
-    books.forEach(element => {
+    let temp = [];
+
+    books.forEach((element) => {
       if (parseInt(element.rating) == searchKey) {
-        temp.push(element)
+        temp.push(element);
       }
-      
-    }
-    );
-  setFeedbacks(temp)
+    });
+    setFeedbacks(temp);
     // console.log(result);
     // setFeedbacks(result);
   };
 
   const filterFeedbacks = async (e) => {
     await axios
-    .get(`/feedback/getFeedbacks/${book}`)
-    .then((res) => {
-      // console.log(res.data.feedbacks);
-      filterDatas(res.data.feedbacks,e)
-      
-    })
-    .catch((err) => {
-      console.log(JSON.stringify(err));
-    });
-  }
+      .get(`/feedback/getFeedbacks/${book}`)
+      .then((res) => {
+        // console.log(res.data.feedbacks);
+        filterDatas(res.data.feedbacks, e);
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+      });
+  };
 
   //delete feedback
   const deletefeedback = async (id) => {
@@ -212,65 +206,87 @@ const BookFeedback = ({ navigation, route }) => {
 
   return (
     <>
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
-      <ImageBackground
-        style={{marginBottom: 30}}
-        source={{
-          uri: "https://t3.ftcdn.net/jpg/04/09/76/38/360_F_409763869_m3QVL4OELQaLmRU8AEicBlkduNlBAMpm.jpg",
-        }}
-      >
-      <View style={style.header}>
-        <Icon name="arrow-back" size={28} onPress={() => navigation.goBack()} />
-      </View>
-      
-      
-      
-      <View style={style.buttonContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.push("CreateFeedback", book)}
-          style={style.getStartedButton}
+      <SafeAreaView style={{ flex: 6 }}>
+        <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
+        <ImageBackground
+          style={{ marginBottom: 30 }}
+          source={{
+            uri: "https://t3.ftcdn.net/jpg/04/09/76/38/360_F_409763869_m3QVL4OELQaLmRU8AEicBlkduNlBAMpm.jpg",
+          }}
         >
-          <Text style={style.buttonText}>Feedback</Text>
-          <Icon name="add" size={27} color={COLORS.white} />
-        </TouchableOpacity>
-      </View>
-      </ImageBackground>
+          <View style={style.header}>
+            <Icon
+              name="arrow-back"
+              size={28}
+              onPress={() => navigation.goBack()}
+            />
+          </View>
 
-      <View style={style.searchContainer}>
-      <Text style={style.filtertext}>Filter Feedbacks by Stars:   </Text>
-      
-      <SelectList  
-        setSelected={(key) => filterFeedbacks(key)} 
-        data={filterdata} 
-        save="key"
-         
-        label="Categories"
-    /></View>
-    
-     
-      {feedbacks.length > 0 ? (
-            <ScrollView>
+          <View style={style.buttonContainer}>
+            <TouchableOpacity
+              onPress={() => navigation.push("CreateFeedback", book)}
+              style={style.getStartedButton}
+            >
+              <Text style={style.buttonText}>Feedback</Text>
+              <Icon name="add" size={27} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+
+        <View style={style.searchContainer}>
+          <Text style={style.filtertext}>Filter Feedbacks by Stars: </Text>
+
+          <SelectList
+            setSelected={(key) => filterFeedbacks(key)}
+            data={filterdata}
+            save="key"
+            label="Categories"
+          />
+        </View>
+
+        {feedbacks.length > 0 ? (
+          <ScrollView>
             {feedbacks.map((post) => (
               <TouchableOpacity key={post._id} style={style.post}>
                 <View style={style.postContent}>
-                  <Text style={style.postTitle}>
-                    {post.user.fullName}
-                    <Icon
-                      justifyContent="flex-end"
-                      name="star"
-                      size={responsiveFontSize(4)}
-                      color="#ffb300"
+                  <View style={{ flexDirection: "row" }}>
+                    <Image
+                      source={{
+                        uri:
+                          post.user.picture ||
+                          "https://res.cloudinary.com/desnqqj6a/image/upload/v1667591378/user_1_bze4lv.png",
+                      }}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        objectFit: "cover",
+                        borderRadius: 50,
+                      }}
                     />
-                    {post.rating}/5
-                  </Text>
+                    <Text style={style.postTitle}>
+                      {"  "}
+                      {post.user.fullName} |
+                      <Icon
+                        justifyContent="flex-end"
+                        name="star"
+                        size={responsiveFontSize(4)}
+                        color="#ffb300"
+                      />
+                      {post.rating}/5
+                    </Text>
+                  </View>
                   {post.user._id === user._id ? (
                     <View
                       style={{
-                        width: "10%",
+                        width: 40,
+                        height: 40,
                         marginLeft: "77%",
                         flexDirection: "row",
                         alignItems: "center",
+                        borderRadius: 10,
+                        backgroundColor: COLORS.white,
+                        alignItems: "center",
+                        position: "relative",
                       }}
                     >
                       <TouchableOpacity
@@ -282,7 +298,13 @@ const BookFeedback = ({ navigation, route }) => {
                       </TouchableOpacity>
                       <View
                         style={{
-                          marginLeft: "30%",
+                          width: 40,
+                          height: 40,
+                          marginLeft: "60%",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderRadius: 10,
+                          backgroundColor: COLORS.white,
                         }}
                       >
                         <TouchableOpacity
@@ -308,15 +330,19 @@ const BookFeedback = ({ navigation, route }) => {
                       </View>
                     </View>
                   ) : null}
-    
-                  <Text style={style.postMeta}>Created at | {moment(user.createdAt).format("YYYY-MM-DD")}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text style={style.postMeta}>
+                      <Icon name="timer" size={19} color={COLORS.black} />{" "}
+                      {moment(post.createdAt).fromNow()}
+                    </Text>
+                  </View>
                   <Text style={style.postExcerpt}>{post.feedback}</Text>
                 </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
-      ): (
-        <View
+        ) : (
+          <View
             style={{
               alignItems: "center",
               marginTop: "40%",
@@ -341,10 +367,9 @@ const BookFeedback = ({ navigation, route }) => {
               No Feedbacks Yet
             </Text>
           </View>
-      )}
-      
-    </SafeAreaView>
-    {loading ? <CustomLoading /> : ""}
+        )}
+      </SafeAreaView>
+      {loading ? <CustomLoading /> : ""}
     </>
   );
 };
@@ -435,6 +460,7 @@ const style = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     marginTop: responsiveHeight(29),
+    marginBottom: responsiveHeight(2),
     maxWidth: 200,
   },
 
@@ -448,16 +474,14 @@ const style = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 19,
     marginBottom: 7,
-    marginTop:10,
-    
+    marginTop: 10,
   },
   searchContainer: {
     alignItems: "flex-start",
     marginLeft: 19,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom:15
-    
+    marginBottom: 15,
   },
 
   editButton: {
