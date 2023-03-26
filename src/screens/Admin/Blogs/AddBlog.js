@@ -100,7 +100,19 @@ const AddBlog = ({ navigation }) => {
 
   //Publish blog
   const publishBlog = async () => {
-    setError("");
+    if (!blogTitle || !blogContent || !blogCategory) {
+      setError("Please fill all the fields");
+      return;
+    }
+    if (blogTitle.length < 5) {
+      setError("Blog title should be atleast 5 characters long");
+      return;
+    }
+    if (blogContent.length < 10) {
+      setError("Blog content should be atleast 50 characters long");
+      return;
+    }
+
     body.append("blogTitle", blogTitle);
     body.append("blogContent", blogContent);
     body.append("blogBanner", blogImage);
@@ -314,7 +326,14 @@ const AddBlog = ({ navigation }) => {
                   }}
                 >
                   <Text
-                    style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+                    style={{
+                      color: "white",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginTop: 10,
+                    }}
                   >
                     {error}
                   </Text>
